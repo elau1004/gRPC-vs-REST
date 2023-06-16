@@ -1,6 +1,6 @@
 import myproject
-l = myproject.get_logger()
-l.info(f"I am in {__name__} 1")
+l1 = myproject.get_logger()
+l1.info(f"I am in {__name__} 1")
 
 
 # The following output a duplicated line.
@@ -21,7 +21,6 @@ pass
 
 # Sample output.
 # --------------
-# 20230615Thu 211430.252 (23540.14528)[INFO __init__] Environment is to be configured for 'dev'.
-# 20230615Thu 212237.726 (16200.12888)[INFO test] I am in __main__ 1
-# 20230615Thu 212237.727 (16200.12888)[INFO test] I am in __main__ 2
-# 20230615Thu 212237.727 (16200.12888)[INFO test] I am in __main__ 2
+# 20230616Fri 140237.324 (0a0000E0.23596)[INFO __init__] Environment is to be configured for 'dev'.
+# 20230616Fri 140239.572 (0a0000E0.23596)[INFO test] I am in __main__ 1
+# 20230616Fri 140239.572 (0a0000E0.23596)[INFO test] I am in __main__ 2

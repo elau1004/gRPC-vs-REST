@@ -17,11 +17,7 @@ class Class1:
 
 # Sample output.
 # --------------
-# 20230615Thu 211441.920 (23540.14528)[INFO class1] I am in myproject.subdir1.class1 using the class  logger
-# 20230615Thu 211441.920 (23540.14528)[INFO class1] I am in myproject.subdir1.class1 using the class  logger
-# 20230615Thu 211441.921 (23540.14528)[INFO class1] I am in myproject.subdir1.class1 using the module logger
-# 20230615Thu 211441.921 (23540.14528)[INFO class1] I am in myproject.subdir1.class1 using the module logger
-# 20230615Thu 211441.921 (23540.14528)[ERR  class1] I am running in myproject.subdir1.class1.run() using the class  logger
-# 20230615Thu 211441.921 (23540.14528)[ERR  class1] I am running in myproject.subdir1.class1.run() using the class  logger
-# 20230615Thu 211441.922 (23540.14528)[ERR  class1] I am running in myproject.subdir1.class1.run() using the module logger
-# 20230615Thu 211441.922 (23540.14528)[ERR  class1] I am running in myproject.subdir1.class1.run() using the module logger
+# 20230616Fri 140239.576 (0a0000E0.23596)[INFO class1] I am in myproject.subdir1.class1 using the class  logger
+# 20230616Fri 140239.576 (0a0000E0.23596)[INFO class1] I am in myproject.subdir1.class1 using the module logger
+# 0230616Fri 140239.577 (0a0000E0.23596)[ERR  class1] I am running in myproject.subdir1.class1.run() using the class  logger
+# 20230616Fri 140239.579 (0a0000E0.23596)[ERR  class1] I am running in myproject.subdir1.class1.run() using the module logger
