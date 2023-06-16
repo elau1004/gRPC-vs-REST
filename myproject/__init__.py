@@ -29,6 +29,7 @@ from    logging import Logger
 import  yaml
 from    dotenv  import load_dotenv ,find_dotenv
 
+
 # Common initialization section.
 #
 
@@ -40,6 +41,8 @@ else:
 
 # TODO: Finish up the reading of config from the cloud for Non-development environment.
 #       Default to local YAML for development.
+#       "Auto" detect install python modules.
+cloud_handle = None
 try:
     import hvac     # HashiCorp Vault
 except:
@@ -70,21 +73,40 @@ for key in ycfg['global']:
 for key in ycfg[ RUN_ENV ]:
     config[ key ] = ycfg[ RUN_ENV ][ key ]
 
+# Clear out the temporary variables and class objects.
+del( path2yml )
+del( fn )
+del( key )
+del( ycfg )
+del( yaml )
+del( load_dotenv )
+del( find_dotenv )
+
+
+class MyLogger( logging.Logger ):
+    MYIP:str = None
+
+    def __init__( self, name, level=logging.NOTSET ):
+        super().__init__( name ,level )        
+        # Set the static class my IP variable.
+        if  MyLogger.MYIP is None:
+            import socket
+            MyLogger.MYIP = ''.join([hex(int(g)).removeprefix('0x').zfill(2).capitalize() for g in socket.gethostbyname( socket.gethostname() ).split('.')])
+
+    # Overwrite this method to default extra variables for formatting log messages.
+    def makeRecord( self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None, sinfo=None ):
+        if  not extra:
+            extra={'myip': None}
+        if  extra['myip']  is None:
+            extra['myip']  =  MyLogger.MYIP
+
+        return super().makeRecord( name, level, fn, lno, msg, args, exc_info, func, extra, sinfo )
+
 
 # Common routines section.
 #
-def get_db_session() -> object:
-    """
-    Return a SQLAlchemy session.  All information need to instantiate a session is the root config dict.
-
-    Args:
-        None
-    Return:
-        Session
-    """
-    # TODO: Finish this up.
-    return None
-
+logging.setLoggerClass(MyLogger)
+_logger = None  # Cached for reuse.
 
 def get_logger(
         log_name:str=None,
@@ -111,6 +133,10 @@ def get_logger(
     Return:
         Logger
     """
+    global _logger
+    if _logger:
+        return _logger
+
     log_fragment = datetime.datetime.utcnow().strftime( config['logger']['log_fragment'] )
 
     if  not log_level:
@@ -139,28 +165,30 @@ def get_logger(
         if 'dtm_format' in config['logger']:
             dtm_format  =  config['logger']['dtm_format']
         else:
-            dtm_format  =  "%Y%m%d %H%M%S.%f"
+            dtm_format  =  "%Y%m%d%a %H%M%S.%f"
     if  not msg_format:
         if 'msg_format' in config['logger']:
             msg_format  =  config['logger']['msg_format']
         else:
-            msg_format  = "%(asctime)s.%(msecs)03d (%(process)d.%(thread)05d)[%(levelname)s %(name)s] %(message)s"
+            msg_format  = "%(asctime)s.%(msecs)03d (%(myip)s.%(process)d.%(thread)05d)[%(levelname)s %(module)s] %(message)s"
     if  not log_name:
         # Get the name of the caller and NOT this module.
         log_name = inspect.getmodulename( inspect.stack()[1][1] )
 
-    logger = logging.getLogger( log_name )
-    logger.setLevel( log_level )
+    _logger = logging.getLogger( log_name )
+    _logger.setLevel( log_level )
 
-    log_formatter = logging.Formatter( msg_format ,datefmt=dtm_format )
+    log_formatter = logging.Formatter( msg_format ,datefmt=dtm_format ,defaults={} )
     if 'TERM' in os.environ or ('SESSIONNAME' in os.environ and os.environ['SESSIONNAME'] == 'Console'):
         # NOTE: We are NOT running in the background therefore spool to console.
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter( log_formatter )
-        logger.addHandler( stream_handler )
+        _logger.addHandler( stream_handler )
 
     if  'CLOUD_CONFIG_URL' in os.environ and os.environ['CLOUD_CONFIG_URL']:
         # TODO: Finish up the cloud logger handler.
+        #       "Auto" detect install python modules.
+        cloud_handle = logging.NullHandler()
         try:
             from google.cloud import logging as cloud_logging
         except:
@@ -174,6 +202,8 @@ def get_logger(
                         import oci
                     except:
                         pass
+
+        _logger.addHandler( cloud_handle )
     else:
         # Set up the file handler.
         if  not log_pathname:
@@ -182,7 +212,7 @@ def get_logger(
 
         file_info_handler=logging.FileHandler( log_pathname ,mode='a' )
         file_info_handler.setFormatter( log_formatter )
-        logger.addHandler( file_info_handler )
+        _logger.addHandler( file_info_handler )
 
         # Set up the err handler.
         if  not err_pathname:
@@ -192,7 +222,7 @@ def get_logger(
         file_err_handler=logging.FileHandler( err_pathname ,mode='a' )
         file_err_handler.setFormatter( log_formatter )
         file_err_handler.setLevel( logging.ERROR )
-        logger.addHandler( file_err_handler )
+        _logger.addHandler( file_err_handler )
 
     # NOTE: Keep the level name length fixed so that the log line before the message is consistent.
     logging._levelToName = {
@@ -203,17 +233,22 @@ def get_logger(
         logging.DEBUG: 'DBUG',      # 10
         logging.NOTSET: 'NOTSET',   # 00
     }
-    return logger
+    return _logger
+
+def get_db_session() -> object:
+    """
+    Return a SQLAlchemy session.  All information need to instantiate a session is the root config dict.
+
+    Args:
+        None
+    Return:
+        Session
+    """
+    # TODO: Finish this up.
+    return None
+
 
 get_logger().info(f"Environment is to be configured for '{RUN_ENV}'.")
-# NOTE: Just trying things out.  May not be needed.
 # Clear out the temporary variables and class objects.
 del( RUN_ENV )
-del( path2yml )
-del( fn )
-del( key )
-del( ycfg )
-del( yaml )
-del( load_dotenv )
-del( find_dotenv )
 

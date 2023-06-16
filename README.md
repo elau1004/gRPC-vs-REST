@@ -19,3 +19,11 @@ An API Service example.
 * https://www.openpolicyagent.org/docs/latest/ecosystem/#
 ### Logging
 * https://www.toptal.com/python/in-depth-python-logging
+### Caching
+* https://dzone.com/articles/process-caching-vs-distributed
+### Serialization/Deserialization
+* https://pymotw.com/2/pickle/
+* https://github.com/kochelmonster/larch-pickle
+* https://ray-project.github.io/2017/10/15/fast-python-serialization-with-ray-and-arrow.html
+### Networking
+* https://www.howtogeek.com/devops/how-to-run-multiple-docker-containers-on-different-ip-addresses/
