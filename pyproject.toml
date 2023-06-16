@@ -1,0 +1,27 @@
+# SEE:  https://python-poetry.org/docs/pyproject/
+
+[project]
+name = "MyAlembic"
+version = "0.0.1"
+description = "My Alembic Project Example"
+requires-python = ">=3.11"
+keywords = ["python", "example", "alembic" ,"sqlalchemy"]
+authors = [
+    "Edward Lau <edward.lau@cinnamon.com>"
+]
+
+[options]
+python_requires = ">=3.11"
+
+[tool.isort]
+line_length = 100
+include_trailing_comma = true
+profile = "black"
+
+[tool.black]
+line-length = 160
+include = '\.py'
+exclude = '''(
+  \.git
+ |\.vscode
+)'''

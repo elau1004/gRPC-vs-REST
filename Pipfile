@@ -1,0 +1,39 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fs = ">=2.4"
+PyYAML = ">=6.0"
+python-dotenv = ">=1.0"
+python-dateutil = ">=2.8"
+psycopg2 = ">=2.9"
+psycopg = {version = ">=3.1", extras = ["binary"]}
+sqlalchemy = ">=2.0"
+pydantic = ">=1.10"
+alembic = ">=1.11"
+fastapi = ">=0.95"
+hypercorn = ">=0.14"
+httpx = {version = ">=0.24", extras = ["http2"]}
+graphene = ">=3.2"
+graphene-pydantic = ">=0.4"
+graphene-sqlalchemy = ">=2.1"
+
+[dev-packages]
+pre-commit = "*"
+isort = "*"
+black = "*"
+flake8 = "*"
+ruff = "*"
+pyupgrade = "*"
+bandit = "*"
+vulture = "*"
+pytest = "*"
+behave = "*"
+
+[requires]
+python_version = "3.11"
+
+[scripts]
+helloworld = "python -c \"print('Hello World. Ran from: pipenv run helloworld')\""
