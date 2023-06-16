@@ -183,7 +183,7 @@ def get_logger(
         # NOTE: We are NOT running in the background therefore spool to console.
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter( log_formatter )
-        logger.addHandler( stream_handler )
+        _logger.addHandler( stream_handler )
 
     if  'CLOUD_CONFIG_URL' in os.environ and os.environ['CLOUD_CONFIG_URL']:
         # TODO: Finish up the cloud logger handler.
@@ -212,7 +212,7 @@ def get_logger(
 
         file_info_handler=logging.FileHandler( log_pathname ,mode='a' )
         file_info_handler.setFormatter( log_formatter )
-        logger.addHandler( file_info_handler )
+        _logger.addHandler( file_info_handler )
 
         # Set up the err handler.
         if  not err_pathname:
@@ -222,7 +222,7 @@ def get_logger(
         file_err_handler=logging.FileHandler( err_pathname ,mode='a' )
         file_err_handler.setFormatter( log_formatter )
         file_err_handler.setLevel( logging.ERROR )
-        logger.addHandler( file_err_handler )
+        _logger.addHandler( file_err_handler )
 
     # NOTE: Keep the level name length fixed so that the log line before the message is consistent.
     logging._levelToName = {
@@ -233,7 +233,20 @@ def get_logger(
         logging.DEBUG: 'DBUG',      # 10
         logging.NOTSET: 'NOTSET',   # 00
     }
-    return logger
+    return _logger
+
+def get_db_session() -> object:
+    """
+    Return a SQLAlchemy session.  All information need to instantiate a session is the root config dict.
+
+    Args:
+        None
+    Return:
+        Session
+    """
+    # TODO: Finish this up.
+    return None
+
 
 def get_db_session() -> object:
     """
