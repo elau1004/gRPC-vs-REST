@@ -1,10 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023 Edward Lau
-
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2019 Edward Lau <elau1004@netscape.net>
+# Copyright (C) 2023 Edward Lau <elau1004@netscape.net>
 # Licensed under the MIT License.
 #
 # Author        Changes On  Comment
@@ -14,7 +10,7 @@
 The common initialization for all modules.
 The following objects are made available:
     cfg           - The global configuraiton for all to use.
-    RUN_ENV       - The global variable to indicate the runtime environment.  Should be 'prod' ,'cicd' ,'dev'.
+    RUN_ENV       - The global variable to indicate the runtime environment.  e.g. 'dev' ,'cicd' ,'test' ,stg' ,'qa' ,'prod'.
     get_logger()  - The global method to return a logger for all to use.
 """
 
@@ -29,6 +25,10 @@ from    logging import Logger
 import  yaml
 from    dotenv  import load_dotenv ,find_dotenv
 
+# Common Global constants.
+#
+APP_NAME = "myproject"
+APP_VERSION = "0.0.1"
 
 # Common initialization section.
 #
@@ -67,13 +67,14 @@ with open( path2yml ) as fn:
         raise KeyError(f"Value '{RUN_ENV}' in variable RUN_ENV is not set in {path2yml} yaml file." )
 
 # NOTE: Setup the global config to be shared.
-config = {}
+config = {'env': RUN_ENV }
 for key in ycfg['global']:
     config[ key ] = ycfg['global'][ key ]
 for key in ycfg[ RUN_ENV ]:
     config[ key ] = ycfg[ RUN_ENV ][ key ]
 
 # Clear out the temporary variables and class objects.
+del( RUN_ENV )
 del( path2yml )
 del( fn )
 del( key )
@@ -106,10 +107,9 @@ class MyLogger( logging.Logger ):
 # Common routines section.
 #
 logging.setLoggerClass(MyLogger)
-_logger = None  # Cached for reuse.
 
 def get_logger(
-        log_name:str=None,
+        name:str=None,
         log_pathname:str=None,
         err_pathname:str=None,
         log_dir:str=None,
@@ -122,7 +122,7 @@ def get_logger(
     Return a global standardized logger for you to log your messages.
     
     Args:
-        log_name    - Name for this logger.  Default to the name of the calling module.
+        name        - Name for this logger.  Default to the name of the calling module.
         log_pathname- Full path name to the log file.  Will default timestamp into the name.
         err_pathname- Full path name to the err file.  Will default timestamp into the name.
         log_dir     - The root directory for collecting the logs.  Default to 'logs' in your home direcory.
@@ -133,11 +133,14 @@ def get_logger(
     Return:
         Logger
     """
-    global _logger
-    if _logger:
-        return _logger
+    if  not name:
+        # Get the name of the caller and NOT this module.
+        name = inspect.getmodulename( inspect.stack()[1][1] )
 
-    log_fragment = datetime.datetime.utcnow().strftime( config['logger']['log_fragment'] )
+    logger = logging.getLogger( name )
+    if logger.hasHandlers():
+        # Was previously setup and cached by the Python logger.
+        return logger
 
     if  not log_level:
         if 'LOG_LEVEL' in os.environ:
@@ -171,14 +174,11 @@ def get_logger(
             msg_format  =  config['logger']['msg_format']
         else:
             msg_format  = "%(asctime)s.%(msecs)03d (%(myip)s.%(process)d.%(thread)05d)[%(levelname)s %(module)s] %(message)s"
-    if  not log_name:
-        # Get the name of the caller and NOT this module.
-        log_name = inspect.getmodulename( inspect.stack()[1][1] )
 
-    _logger = logging.getLogger( log_name )
-    _logger.setLevel( log_level )
-
+    logger.setLevel( log_level )
+    log_fragment = datetime.datetime.utcnow().strftime( config['logger']['log_fragment'] )
     log_formatter = logging.Formatter( msg_format ,datefmt=dtm_format ,defaults={} )
+
     if 'TERM' in os.environ or ('SESSIONNAME' in os.environ and os.environ['SESSIONNAME'] == 'Console'):
         # NOTE: We are NOT running in the background therefore spool to console.
         stream_handler = logging.StreamHandler()
@@ -203,11 +203,11 @@ def get_logger(
                     except:
                         pass
 
-        _logger.addHandler( cloud_handle )
+        logger.addHandler( cloud_handle )
     else:
         # Set up the file handler.
         if  not log_pathname:
-            log_pathname = os.path.join( log_dir ,log_group ,log_name +'_' +log_fragment +'.log' ) 
+            log_pathname = os.path.join( log_dir ,log_group ,name +'_' +log_fragment +'.log' ) 
         Path( os.path.dirname( log_pathname )).mkdir( parents=True ,exist_ok=True )
 
         file_info_handler=logging.FileHandler( log_pathname ,mode='a' )
@@ -216,7 +216,7 @@ def get_logger(
 
         # Set up the err handler.
         if  not err_pathname:
-            err_pathname = os.path.join( log_dir ,log_group ,log_name +'_' +log_fragment +'.err' ) 
+            err_pathname = os.path.join( log_dir ,log_group ,name +'_' +log_fragment +'.err' ) 
         Path( os.path.dirname( err_pathname )).mkdir( parents=True ,exist_ok=True )
 
         file_err_handler=logging.FileHandler( err_pathname ,mode='a' )
@@ -248,7 +248,15 @@ def get_db_session() -> object:
     return None
 
 
-get_logger().info(f"Environment is to be configured for '{RUN_ENV}'.")
-# Clear out the temporary variables and class objects.
-del( RUN_ENV )
+def get_db_session() -> object:
+    """
+    Return a SQLAlchemy session.  All information need to instantiate a session is the root config dict.
+
+    Args:
+        None
+    Return:
+        Session
+    """
+    # TODO: Finish this up.
+    return None
 
