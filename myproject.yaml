@@ -1,0 +1,92 @@
+# myproject.yml
+
+# This file is for static configuration while env var are for sensitive or boot strap configuration.
+# Global configuration.
+# Don't delete any of the following.
+global:
+  logger: 
+    log_dir: ./logs
+    log_fragment: "%Y%m%d%a"
+    dtm_format: "%Y%m%d%a %H%M%S"
+    msg_format: "%(asctime)s.%(msecs)03d (%(process)d.%(thread)05d)[%(levelname)s %(name)s] %(message)s"
+    level: INFO
+
+# Development environment.
+# The root node 'dev' will be removed in the config dict object.
+dev:
+  database:
+    # Don't delete this.
+    etlite:
+      uri: "sqlite:///etlite.sqlite3.dev.db"
+      user: ~
+      pass: ~
+      role: ~
+    yourdb:
+      uri: "mssql+pyodbc://@YourDWH"
+      user: dev_user
+      pass: /dev/database/yourdwh/password
+      role: ~
+  storage:
+    awss3:
+      access_key: your-access_key
+      secret_key: /dev/storage/aws/s3/secretkey
+      bucket: dev
+    azure:
+      account_name: your-account-name
+      account_key: /dev/storage/aws/s3/secretkey
+      container: dev
+
+# CICD or QA environment.
+# The root node 'cicd' will be removed in the config dict object.
+cicd:
+  database:
+    # Don't delete this.
+    etlite:
+      uri: "sqlite:///etlite.sqlite3.cdci.db"
+      pass: ~
+      user: ~
+      role: ~
+    yourdb:
+      uri: "mssql+pyodbc://@YourDWH"
+      user: cicd_user
+      pass: /cicd/database/yourdwh/password
+      role: ~
+  storage:
+    awss3:
+      access_key: your-access_key
+      secret_key: /cicd/storage/aws/s3/secretkey
+      bucket: cicd
+    azure:
+      account_name: your-account-name
+      account_key: /cicd/storage/aws/s3/secretkey
+      container: cicd
+
+# Production environment.
+# The root node 'prod' will be removed in the config dict object.
+prod:
+  database:
+    # Don't delete this.
+    etlite:
+      uri: "sqlite:///etlite.sqlite3.prod.db"
+      user: ~
+      pass: ~
+      role: ~
+    yourdb:
+      uri: "mssql+pyodbc://@YourDWH"
+      user: prod_user
+      pass: /prod/database/yourdwh/password
+      role: ~
+  storage:
+    awss3:
+      access_key: your-access_key
+      secret_key: /prod/storage/aws/s3/secretkey
+      bucket: prod
+    azure:
+      account_name: your-account-name
+      account_key: /prod/storage/aws/s3/secretkey
+      container: prod
+
+# Production customer environment.
+# The root node shall be unique short mnemonic assigned to the customer.
+slug:
+  database:
