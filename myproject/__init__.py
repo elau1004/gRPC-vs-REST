@@ -32,7 +32,6 @@ __author__  = "Edward Lau<elau1004@netscape.net>"
 __version__ = "0.0.1"
 __date__    = "Dec 15, 2019"    # Ported from ETLite.
 
-
 # Common initialization section.
 #
 
