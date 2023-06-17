@@ -1,6 +1,41 @@
-# The script is to test the behavor of our gloabl get_logger() method.
+# The script is to test the behavor of our gloabl config, CaseInsensitiveDict, get_logger() method.
 #
-import sys
+from  myproject import CaseInsensitiveDict as cidict
+
+cid = cidict()
+cid[ 1 ] = '123456'
+print(f"cid[ 1 ] is {cid[ 1 ]}")
+cid[ 1 ] = 'abcdef'
+print(f"cid[ 1 ] is {cid[ 1 ]}")
+cid['a'] = 'aAbBcB'
+print(f"cid['a'] is {cid['a']}")
+cid['A'] = '123345'
+print(f"cid['a'] is {cid['a']}")
+print(f"cid['A'] is {cid['a']}")
+
+if 'A' in cid:
+    print(f"'A' is     in cid.")
+else:
+    print(f"'A' is NOT in cid.")
+
+cid['b'] = 'xyz'
+if 'B' in cid:
+    print(f"'B' is     in cid.")
+    cid.pop('B')
+if 'B' not in cid:
+    print(f"'B' is NOT in cid.")
+
+# Sample output.
+# --------------
+# cid[ 1 ] is 123456
+# cid[ 1 ] is abcdef
+# cid['a'] is aAbBcB
+# cid['a'] is 123345
+# cid['A'] is 123345
+# 'A' is     in cid.
+# 'B' is     in cid.
+# 'B' is NOT in cid.
+
 
 import myproject
 l1 = myproject.get_logger()

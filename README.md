@@ -8,6 +8,7 @@ An API Service example.
 * https://www.youtube.com/watch?v=Puvr82Cm26o
 ### HTTP client
 * https://medium.com/swlh/how-to-boost-your-python-apps-using-httpx-and-asynchronous-calls-9cfe6f63d6ad
+* https://medium.com/python-pandemonium/how-to-serve-http-2-using-python-5e5bbd1e7ff1
 * https://medium.com/gitconnected/deploy-fastapi-with-hypercorn-http-2-asgi-8cfc304e9e7a
 ### gRPC
 * https://grpc.io/docs/what-is-grpc/introduction/
