@@ -27,8 +27,11 @@ from    dotenv  import load_dotenv ,find_dotenv
 
 # Common Global constants.
 #
-APP_NAME = "myproject"
-APP_VERSION = "0.0.1"
+__app__     = "myexample"
+__author__  = "Edward Lau<elau1004@netscape.net>"
+__version__ = "0.0.1"
+__date__    = "Dec 15, 2019"    # Ported from ETLite.
+
 
 # Common initialization section.
 #
@@ -41,24 +44,28 @@ else:
 
 # TODO: Finish up the reading of config from the cloud for Non-development environment.
 #       Default to local YAML for development.
-#       "Auto" detect install python modules.
+#       Auto detect installed python modules.
 cloud_handle = None
 try:
-    import hvac     # HashiCorp Vault
+    from infisical import InfisicalClient
 except:
     try:
-        from google.cloud import secretmanager
+        import hvac     # HashiCorp Vault
     except:
         try:
-            import boto3    # AWS
+            from google.cloud import secretmanager
         except:
             try:
-                from azure.keyvault.secrets import SecretClient     # Azure
+                import boto3    # AWS
             except:
                 try:
-                    import oci  # Oracle
+                    from azure.keyvault.secrets import SecretClient
                 except:
-                    pass
+                    try:
+                        import oci  # Oracle
+                    except:
+                        # TODO: Default to local.
+                        pass
 
 path2yml = str( sorted( Path( os.getcwd()).glob( '**/*.yaml' )).pop())
 with open( path2yml ) as fn:    
@@ -85,6 +92,9 @@ del( find_dotenv )
 
 
 class MyLogger( logging.Logger ):
+    """
+    Custom logger to overwrite the makeRecord() method so that I wil lalways have an IP address attribute.
+    """
     MYIP:str = None
 
     def __init__( self, name, level=logging.NOTSET ):
@@ -183,7 +193,7 @@ def get_logger(
         # NOTE: We are NOT running in the background therefore spool to console.
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter( log_formatter )
-        _logger.addHandler( stream_handler )
+        logger.addHandler( stream_handler )
 
     if  'CLOUD_CONFIG_URL' in os.environ and os.environ['CLOUD_CONFIG_URL']:
         # TODO: Finish up the cloud logger handler.
@@ -205,24 +215,37 @@ def get_logger(
 
         logger.addHandler( cloud_handle )
     else:
-        # Set up the file handler.
-        if  not log_pathname:
-            log_pathname = os.path.join( log_dir ,log_group ,name +'_' +log_fragment +'.log' ) 
-        Path( os.path.dirname( log_pathname )).mkdir( parents=True ,exist_ok=True )
+        # TODO: Implement log rotation.
+        # SEE:  https://www.blog.pythonlibrary.org/2014/02/11/python-how-to-create-rotating-logs/
 
-        file_info_handler=logging.FileHandler( log_pathname ,mode='a' )
-        file_info_handler.setFormatter( log_formatter )
-        _logger.addHandler( file_info_handler )
+        # Set up the file handler.
+        if  log_pathname:
+            log_pathname = os.path.join( log_dir ,log_group ,name +'_' +log_fragment +'.log' ) 
+        else:
+            # TODO: Check config.  If configured build the log_pathanme.
+            pass
+
+        if  log_pathname:
+            Path( os.path.dirname( log_pathname )).mkdir( parents=True ,exist_ok=True )
+
+            file_info_handler=logging.FileHandler( log_pathname ,mode='a' )
+            file_info_handler.setFormatter( log_formatter )
+            logger.addHandler( file_info_handler )
 
         # Set up the err handler.
-        if  not err_pathname:
+        if  err_pathname:
             err_pathname = os.path.join( log_dir ,log_group ,name +'_' +log_fragment +'.err' ) 
-        Path( os.path.dirname( err_pathname )).mkdir( parents=True ,exist_ok=True )
+        else:
+            # TODO: Check config.  If configured build the log_pathanme.
+            pass
 
-        file_err_handler=logging.FileHandler( err_pathname ,mode='a' )
-        file_err_handler.setFormatter( log_formatter )
-        file_err_handler.setLevel( logging.ERROR )
-        _logger.addHandler( file_err_handler )
+        if  err_pathname:
+            Path( os.path.dirname( err_pathname )).mkdir( parents=True ,exist_ok=True )
+
+            file_err_handler=logging.FileHandler( err_pathname ,mode='a' )
+            file_err_handler.setFormatter( log_formatter )
+            file_err_handler.setLevel( logging.ERROR )
+            logger.addHandler( file_err_handler )
 
     # NOTE: Keep the level name length fixed so that the log line before the message is consistent.
     logging._levelToName = {
@@ -233,19 +256,7 @@ def get_logger(
         logging.DEBUG: 'DBUG',      # 10
         logging.NOTSET: 'NOTSET',   # 00
     }
-    return _logger
-
-def get_db_session() -> object:
-    """
-    Return a SQLAlchemy session.  All information need to instantiate a session is the root config dict.
-
-    Args:
-        None
-    Return:
-        Session
-    """
-    # TODO: Finish this up.
-    return None
+    return logger
 
 
 def get_db_session() -> object:
@@ -259,4 +270,3 @@ def get_db_session() -> object:
     """
     # TODO: Finish this up.
     return None
-

@@ -23,8 +23,8 @@ l2.info("")
 
 
 # Get another logger.
-l2 = myproject.get_logger( myproject.APP_NAME )
-l2.info(f"The log file defaulted to '{myproject.APP_NAME:16}  for its filename.")
+l2 = myproject.get_logger( myproject.__name__ )
+l2.info(f"The log file defaulted to '{myproject.__app__:16}  for its filename.")
 l2.info("")
 
 

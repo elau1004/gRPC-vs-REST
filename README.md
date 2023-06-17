@@ -17,6 +17,7 @@ An API Service example.
 ### Security
 * https://youtu.be/7UBm8QFTaq0?t=259
 * https://www.openpolicyagent.org/docs/latest/ecosystem/#
+* https://infisical.com/docs/documentation/getting-started/introduction
 ### Logging
 * https://www.toptal.com/python/in-depth-python-logging
 ### Caching
@@ -27,3 +28,4 @@ An API Service example.
 * https://ray-project.github.io/2017/10/15/fast-python-serialization-with-ray-and-arrow.html
 ### Networking
 * https://www.howtogeek.com/devops/how-to-run-multiple-docker-containers-on-different-ip-addresses/
+* https://pymotw.com/2/socket/multicast.html
