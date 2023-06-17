@@ -9,9 +9,10 @@
 """
 The common initialization for all modules.
 The following objects are made available:
-    cfg           - The global configuraiton for all to use.
-    RUN_ENV       - The global variable to indicate the runtime environment.  e.g. 'dev' ,'cicd' ,'test' ,stg' ,'qa' ,'prod'.
-    get_logger()  - The global method to return a logger for all to use.
+    CaseInsensitiveDict - Case Insensitive dictionary.
+    config              - The global configuration for all to use.
+    get_logger()        - The global method to return a logger for all to use.
+    get_db_session()    - The global SQLAlchemy DB session for you to connect to database.
 """
 
 import  datetime
@@ -19,6 +20,7 @@ import  inspect
 import  logging
 import  os
 import  sys
+from    collections import UserDict
 from    pathlib import Path
 from    logging import Logger
 
@@ -32,6 +34,35 @@ __author__  = "Edward Lau<elau1004@netscape.net>"
 __version__ = "0.0.1"
 __date__    = "Dec 15, 2019"    # Ported from ETLite.
 
+
+class CaseInsensitiveDict( UserDict ):
+    """
+    Case insensitive key dictionary.
+    """
+    def __setitem__( self, key, value ):
+        if  isinstance( key, str ):
+            key = key.lower()
+        super( CaseInsensitiveDict, self ).__setitem__( key, value )
+
+    def __delitem__( self, key ) -> None:
+        if  isinstance( key, str ):
+            key = key.lower()
+        super( CaseInsensitiveDict, self ).__delitem__( key )
+
+    def __getitem__( self, key ):
+        if  isinstance( key, str ):
+            key = key.lower()
+        return super( CaseInsensitiveDict, self ).__getitem__( key )
+
+    def __contains__(self, key):
+        if  isinstance( key, str ):
+            key = key.lower()
+        return key in self.data  # In parent calss.
+
+
+# Clear out the temporary class objects.
+del( UserDict )
+
 # Common initialization section.
 #
 
@@ -44,6 +75,7 @@ else:
 # TODO: Finish up the reading of config from the cloud for Non-development environment.
 #       Default to local YAML for development.
 #       Auto detect installed python modules.
+#       Don't let the your IDE warning optics trip you out.
 cloud_handle = None
 try:
     from infisical import InfisicalClient
