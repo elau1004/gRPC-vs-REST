@@ -63,7 +63,6 @@ class CaseInsensitiveDict( UserDict ):
 # Clear out the temporary class objects.
 del( UserDict )
 
-
 # Common initialization section.
 #
 
