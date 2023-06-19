@@ -14,11 +14,18 @@ sqlalchemy = ">=2.0"
 pydantic = ">=1.10"
 alembic = ">=1.11"
 fastapi = ">=0.95"
+brotli-asgi = ">=1.4"
 hypercorn = ">=0.14"
 httpx = {version = ">=0.24", extras = ["http2"]}
 graphene = ">=3.2"
 graphene-pydantic = ">=0.4"
 graphene-sqlalchemy = ">=2.1"
+# Optional production cloud specific packages.  DON'T install multiple vendors.  ONLY one.
+#infisical = ">=1.2"
+#google-cloud-logging = ">=3.5"
+#google-cloud-secret-manager = ">=2.16"
+#boto3 = ">=1.26"
+#oci = ">=2.104"
 
 [dev-packages]
 pre-commit = "*"
@@ -29,6 +36,7 @@ ruff = "*"
 pyupgrade = "*"
 bandit = "*"
 vulture = "*"
+faker = "*"
 pytest = "*"
 behave = "*"
 

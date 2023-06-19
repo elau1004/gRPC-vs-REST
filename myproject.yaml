@@ -5,11 +5,11 @@
 # Don't delete any of the following.
 global:
   logger: 
-    log_dir: ./logs
-    log_fragment: "%Y%m%d%a"
-    dtm_format: "%Y%m%d%a %H%M%S"
-    msg_format: "%(asctime)s.%(msecs)03d (%(myip)s.%(process)d)[%(levelname)s %(module)s] %(message)s"
-    level: INFO
+    log_level: INFO
+    log_pathname: "./logs/%Y%m%d%a_%H0000.${myip}.log"  # Default log filename.
+    err_pathname: ~                                     # Error log filename.
+    asc_format: "%Y%m%d%a %H%M%S"                       # Format for the "asctime" attribute.
+    msg_format: "%(asctime)s.%(msecs)03d (%(myip)s.%(process)d)[%(levelname)s %(module)s] %(message)s"  # For the logger formatter.
 
 # Development environment.
 # The root node 'dev' will be removed in the config dict object.
