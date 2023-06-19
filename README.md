@@ -30,3 +30,5 @@ An API Service example.
 ### Networking
 * https://www.howtogeek.com/devops/how-to-run-multiple-docker-containers-on-different-ip-addresses/
 * https://pymotw.com/2/socket/multicast.html
+* https://www.geeksforgeeks.org/what-is-mtumaximum-transmission-unit/
+
