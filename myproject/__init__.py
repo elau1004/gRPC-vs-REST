@@ -58,7 +58,7 @@ class CaseInsensitiveDict(UserDict):
     def __contains__(self, key):
         if isinstance(key, str):
             key = key.lower()
-        return key in self.data  # In parent calss.
+        return key in self.data  # In parent class.
 
 
 # Clear out the temporary class objects.

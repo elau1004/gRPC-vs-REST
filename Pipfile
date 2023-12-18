@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+cachetools = ">=5.3"
 fs = ">=2.4"
 PyYAML = ">=6.0"
 python-dotenv = ">=1.0"
@@ -21,8 +22,16 @@ graphene = ">=3.2"
 graphene-pydantic = ">=0.4"
 graphene-sqlalchemy = ">=2.1"
 # Optional production cloud specific packages.  DON'T install multiple vendors.  ONLY one.
+# Install using:  pipenv install [package] --catgeories cloud_logger cloud_secret
+#
+
+[cloud_logger]
 #infisical = ">=1.2"
 #google-cloud-logging = ">=3.5"
+#boto3 = ">=1.26"
+#oci = ">=2.104"
+
+[cloud_secret]
 #google-cloud-secret-manager = ">=2.16"
 #boto3 = ">=1.26"
 #oci = ">=2.104"
@@ -39,6 +48,7 @@ vulture = "*"
 faker = "*"
 pytest = "*"
 behave = "*"
+locust = "*"
 
 [requires]
 python_version = "3.11"
