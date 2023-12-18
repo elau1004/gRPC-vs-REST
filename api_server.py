@@ -1,17 +1,17 @@
-from enum import Enum
 from datetime import date, datetime
+from enum import Enum
 from typing import List, Optional
 
+from brotli_asgi import BrotliMiddleware
 from fastapi import FastAPI, HTTPException, Response, status
 from pydantic import BaseModel, PositiveInt
 from starlette.middleware.gzip import GZipMiddleware
-from brotli_asgi import BrotliMiddleware
 
 
 class Gender(Enum):
     MALE = "male"
     FEMALE = "female"
-    OTHER = "other" 
+    OTHER = "other"
     UNKNOWN = "unknown"
 
 class MaritalStatus(Enum):
@@ -33,56 +33,56 @@ class AddressType(Enum):
     BOTH = "both"
 
 class StateAbbrevation(Enum):
-    AL = "AL"   # Alabama         
-    AK = "AK"   # Alaska          
-    AZ = "AZ"   # Arizona         
-    AR = "AR"   # Arkansas        
-    CA = "CA"   # California      
-    CO = "CO"   # Colorado        
-    CT = "CT"   # Connecticut     
-    DE = "DE"   # Delaware        
-    FL = "FL"   # Florida         
-    GA = "GA"   # Georgia         
-    HI = "HI"   # Hawaii          
-    ID = "ID"   # Idaho           
-    IL = "IL"   # Illinois        
-    IN = "IN"   # Indiana         
-    IA = "IA"   # Iowa            
-    KS = "KS"   # Kansas          
-    KY = "KY"   # Kentucky        
-    LA = "LA"   # Louisiana       
-    ME = "ME"   # Maine           
-    MD = "MD"   # Maryland        
-    MA = "MA"   # Massachusetts   
-    MI = "MI"   # Michigan        
-    MN = "MN"   # Minnesota       
-    MS = "MS"   # Mississippi     
-    MO = "MO"   # Missouri        
-    MT = "MT"   # Montana         
-    NE = "NE"   # Nebraska        
-    NV = "NV"   # Nevada          
-    NH = "NH"   # New Hampshire   
-    NJ = "NJ"   # New Jersey      
-    NM = "NM"   # New Mexico      
-    NY = "NY"   # New York        
-    NC = "NC"   # North Carolina  
-    ND = "ND"   # North Dakota    
-    OH = "OH"   # Ohio            
-    OK = "OK"   # Oklahoma        
-    OR = "OR"   # Oregon          
-    PA = "PA"   # Pennsylvania    
-    RI = "RI"   # Rhode Island    
-    SC = "SC"   # South Carolina  
-    SD = "SD"   # South Dakota    
-    TN = "TN"   # Tennessee       
-    TX = "TX"   # Texas           
-    UT = "UT"   # Utah            
-    VT = "VT"   # Vermont         
-    VA = "VA"   # Virginia        
-    WA = "WA"   # Washington      
-    WV = "WV"   # West Virginia   
-    WI = "WI"   # Wisconsin       
-    WY = "WY"   # Wyoming         
+    AL = "AL"   # Alabama
+    AK = "AK"   # Alaska
+    AZ = "AZ"   # Arizona
+    AR = "AR"   # Arkansas
+    CA = "CA"   # California
+    CO = "CO"   # Colorado
+    CT = "CT"   # Connecticut
+    DE = "DE"   # Delaware
+    FL = "FL"   # Florida
+    GA = "GA"   # Georgia
+    HI = "HI"   # Hawaii
+    ID = "ID"   # Idaho
+    IL = "IL"   # Illinois
+    IN = "IN"   # Indiana
+    IA = "IA"   # Iowa
+    KS = "KS"   # Kansas
+    KY = "KY"   # Kentucky
+    LA = "LA"   # Louisiana
+    ME = "ME"   # Maine
+    MD = "MD"   # Maryland
+    MA = "MA"   # Massachusetts
+    MI = "MI"   # Michigan
+    MN = "MN"   # Minnesota
+    MS = "MS"   # Mississippi
+    MO = "MO"   # Missouri
+    MT = "MT"   # Montana
+    NE = "NE"   # Nebraska
+    NV = "NV"   # Nevada
+    NH = "NH"   # New Hampshire
+    NJ = "NJ"   # New Jersey
+    NM = "NM"   # New Mexico
+    NY = "NY"   # New York
+    NC = "NC"   # North Carolina
+    ND = "ND"   # North Dakota
+    OH = "OH"   # Ohio
+    OK = "OK"   # Oklahoma
+    OR = "OR"   # Oregon
+    PA = "PA"   # Pennsylvania
+    RI = "RI"   # Rhode Island
+    SC = "SC"   # South Carolina
+    SD = "SD"   # South Dakota
+    TN = "TN"   # Tennessee
+    TX = "TX"   # Texas
+    UT = "UT"   # Utah
+    VT = "VT"   # Vermont
+    VA = "VA"   # Virginia
+    WA = "WA"   # Washington
+    WV = "WV"   # West Virginia
+    WI = "WI"   # Wisconsin
+    WY = "WY"   # Wyoming
 
 class ContactPointSystem(Enum):
     PHONE = "phone"
@@ -134,7 +134,7 @@ class Address(BaseModel):
     state : Optional[StateAbbrevation]  # Sub-unit of country (abbreviations ok)
     postal_code : Optional[str]         # Postal code for area
     country : Optional[str] = "US"      # Country (e.g. can be ISO 3166 2 or 3 letter code)
-    # Time period when address was/is in use    
+    # Time period when address was/is in use
     active_from : datetime  = datetime.utcnow()       # Starting time with inclusive boundary
     active_thru : Optional[datetime]                  # End time with inclusive boundary, if not ongoing
 
@@ -164,7 +164,7 @@ class ContactParty(BaseModel):
     ID : PositiveInt
     relationship : PatientContactRelationship       # The kind of relationship
     name : HumanName                                # A name associated with the contact person
-    telecom : Optional[List[ContactPoint]]          # A contact detail for the person
+    telecom : Optional[list[ContactPoint]]          # A contact detail for the person
     address : Optional[Address]                     # Address for the contact person
     gender : Optional[Gender]
 #   organization : { Reference(Organization) }, // C? Organization that is associated with the contact
@@ -175,14 +175,14 @@ class ContactParty(BaseModel):
 class Patient(BaseModel):
     ID : PositiveInt
     active : bool = True
-    name : Optional[List[HumanName]] = None
-    telecom : Optional[List[ContactPoint]] = None
+    name : Optional[list[HumanName]] = None
+    telecom : Optional[list[ContactPoint]] = None
     gender : Optional[Gender]
     birth_date: Optional[date]
     deceased_on: Optional[date]
-    addresses: Optional[List[Address]] = None
+    addresses: Optional[list[Address]] = None
     marital_status: Optional[MaritalStatus] = None  # Marital (civil) status of a patient
-    contact: Optional[List[ContactParty]] = None    # A contact party (e.g. guardian, partner, friend) for the patient
+    contact: Optional[list[ContactParty]] = None    # A contact party (e.g. guardian, partner, friend) for the patient
     preferred_language: Optional[str]               # A language which may be used to communicate with the patient about his or her health.
     # Time period when the patient was/is in use
     active_from : datetime  = datetime.utcnow()     # Starting time with inclusive boundary
@@ -242,7 +242,7 @@ def query_address_by_params(
     city : str | None = None,
     state : StateAbbrevation | None = None,
     postal_code : str | None = None,
-    country : str | None = None,                       
+    country : str | None = None,
 ) -> Address:
     def match_address(address: Address) -> bool:
         return all(

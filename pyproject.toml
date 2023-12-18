@@ -1,27 +1,118 @@
-# SEE:  https://python-poetry.org/docs/pyproject/
-
 [project]
-name = "MyAlembic"
-version = "0.0.1"
-description = "My Alembic Project Example"
-requires-python = ">=3.11"
-keywords = ["python", "example", "alembic" ,"sqlalchemy"]
+name = "gRPC vs REST"
+#version = "0.0.1"
+dynamic = ["version"]
 authors = [
-    "Edward Lau <edward.lau@cinnamon.com>"
+  { name="Edward Lau", email="elau1004@netscape.net" }
+]
+description = "gRPC-vs-REST"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+classifiers = [  #! Update me
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
 ]
 
 [options]
 python_requires = ">=3.11"
 
-[tool.isort]
-line_length = 100
-include_trailing_comma = true
-profile = "black"
+[tool.bandit]
+skips = ["B101" ,"B301" ,"B311" ,"B324" ,"B403"]
 
 [tool.black]
+target-version = ["py310"]
+line-length = 160   # But you should exercise good judgement and keep it as short as possible.
+skip-string-normalization = true
+
+[tool.ruff]
+target-version = "py310"
 line-length = 160
-include = '\.py'
-exclude = '''(
-  \.git
- |\.vscode
-)'''
+select = [
+  "A",    # flake8-builtins
+  "ARG",  # flake8-unused-arguments
+  "B",    # flake8-bugbear
+  "BLE",
+  "C",    #
+  "C4",
+  "C90",
+  "DTZ",  # flake8-datetimez
+  "E",    #
+  "EM",   # flake8-errmsg
+  "F",    # Pyflakes
+  "FBT",  # flake8-boolean-trap
+  "I",    # isort
+  "ICN",  # flake8-import-conventions
+  "ISC",  # flake8-implicit-str-concat
+  "N",    # pep8-naming
+  "PLC",  #
+  "PLE",  #
+  "PLR",  #
+  "PLW",  #
+  "Q",    # flake8-quotes
+  "RET",
+  "RSE",
+  "RUF",  # Ruff-specific rules
+  "S",    # flake8-bandit
+  "T",    #
+  "TCH",
+  "TID",  # flake8-tidy-imports
+  "UP",   # pyupgrade
+  "W",    #
+  "YTT",  # flake8-2020
+]
+ignore = [
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  #"FBT003",
+
+  # Allow mixed-case-variable-in-global-scope
+  "N816",
+
+  # Ignore checks for possible passwords
+  #"S105", "S106", "S107",
+
+  # Ignore bad-quotes-inline-string
+  "Q000",
+
+  # Ignore complexity
+  #"C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+
+  # raw-string-in-exception
+  "EM101",
+
+  # explicit-f-string-type-conversion
+  "RUF010",
+
+  # superfluous-else-return
+  "RET505",
+]
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+]
+
+[tool.ruff.mccabe]
+max-complexity = 14
+
+[tool.ruff.pylint]
+max-branches = 14
+
+[tool.ruff.isort]
+known-first-party = ["mccache"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252"]
