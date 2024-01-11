@@ -22,9 +22,6 @@ class Telecom:
         else:
             self.__value = faker.phone_number()
 
-    def get_system(self):
-        return self.__system
-
     def set_rank(self, num):
         self.__rank = num
 
