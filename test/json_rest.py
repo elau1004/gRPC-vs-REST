@@ -1,9 +1,7 @@
 from faker import Faker
 import datetime
 from dateutil.relativedelta import relativedelta
-import sys
 import random
-from json import dumps
 
 
 class Telecom:
@@ -154,23 +152,3 @@ class Patient:
                          for c in self.__contacts]
         }
         return p_dict
-
-
-def main(size):
-    curr_size = 0
-    patient_list = []
-    while curr_size < size:
-        p = Patient()
-        p.generate_names()
-        p.generate_telecoms()
-        p.generate_addresses()
-        p.generate_contacts()
-        patient_list.append(p)
-        print(dumps(p.ret_dict(), indent=4))
-        curr_size += sys.getsizeof(p)
-
-    return patient_list
-
-
-if __name__ == '__main__':
-    print(main(128))

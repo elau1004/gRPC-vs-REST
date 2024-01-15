@@ -13,11 +13,11 @@ fastapi = ">=0.105"
 brotli-asgi = ">=1.4"
 hypercorn = ">=0.15"
 httpx = {version = ">=0.25", extras = ["http2"]}
-
 # Optional production cloud specific packages.
 # Install using:  pipenv install [package] --catgeories cloud_logger cloud_secret
 #
 # DON'T install multiple vendors.  Install ONLY one.
+ujson = "*"
 
 [cloud_logger]
 #infisical = ">=1.2"
@@ -29,7 +29,6 @@ httpx = {version = ">=0.25", extras = ["http2"]}
 #google-cloud-secret-manager = ">=2.16"
 #boto3 = ">=1.26"
 #oci = ">=2.104"
-
 # Developement tools.
 # Install using:  pipenv install [package] --dev
 
