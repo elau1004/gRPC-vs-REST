@@ -31,8 +31,8 @@ def main(size, data_format: Format):
         case Format.Json:
             return dumps([p.ret_dict() for p in patient_list])
         case Format.Protobuf:
-            return len(generate_patients(size).all_patients)
+            return generate_patients(size).all_patients
 
 
 if __name__ == '__main__':
-    print(main(2048, Format.Protobuf))
+    print(main(128, Format.Protobuf))
