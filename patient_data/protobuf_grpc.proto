@@ -10,41 +10,42 @@ message Name {
 
 message Telecom {
   optional string system = 1;
-  optional string value = 2;
-  optional string use = 3;
-  optional int32 rank = 4;
-  optional string active = 5;
+  optional string use = 2;
+  optional int32 rank = 3;
+  optional string active = 4;
+  optional string value = 5;
 }
 
 message Address {
   optional string use = 1;
   optional string type = 2;
-  optional string text = 3;
-  optional string line = 4;
-  optional string city = 5;
-  optional string state = 6;
-  optional string zipcode = 7;
-  optional string country = 8;
-  map<string, string> period = 9;
+  optional string line = 3;
+  optional string city = 4;
+  optional string state = 5;
+  optional string zipcode = 6;
+  optional string country = 7;
+  optional string period_start = 8;
+  optional string text = 9;
+  optional string period_end = 10;
 }
 
 message Contact {
   optional string relation = 1;
   optional Name name = 2;
-  optional Telecom telecom = 3;
-  optional Address address = 4;
+  optional Address address = 3;
+  optional Telecom telecom = 4;
 }
 
 message Patient {
   optional int32 id = 1;
   optional bool active = 2;
-  repeated Name names = 3;
-  repeated Telecom telecoms = 4;
-  optional string gender = 5;
-  optional string birth_date = 6;
-  optional string deceased_on = 7;
-  repeated Address addresses = 8;
-  optional string marital_status = 9;
+  optional string gender = 3;
+  optional string birth_date = 4;
+  optional string marital_status = 5;
+  optional string deceased_on = 6;
+  repeated Name names = 7;
+  repeated Telecom telecoms = 8;
+  repeated Address addresses = 9;
   repeated Contact contacts = 10;
 }
 
