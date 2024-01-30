@@ -1,0 +1,54 @@
+syntax = 'proto2';
+
+message Name {
+  optional string use = 1;
+  optional string text = 2;
+  optional string given = 3;
+  optional string family = 4;
+  optional string active = 5;
+}
+
+message Telecom {
+  optional string system = 1;
+  optional string use = 2;
+  optional int32 rank = 3;
+  optional string active = 4;
+  optional string value = 5;
+}
+
+message Address {
+  optional string use = 1;
+  optional string type = 2;
+  optional string line = 3;
+  optional string city = 4;
+  optional string state = 5;
+  optional string zipcode = 6;
+  optional string country = 7;
+  optional string period_start = 8;
+  optional string text = 9;
+  optional string period_end = 10;
+}
+
+message Contact {
+  optional string relation = 1;
+  optional Name name = 2;
+  optional Address address = 3;
+  optional Telecom telecom = 4;
+}
+
+message Patient {
+  optional int32 id = 1;
+  optional bool active = 2;
+  optional string gender = 3;
+  optional string birth_date = 4;
+  optional string marital_status = 5;
+  optional string deceased_on = 6;
+  repeated Name names = 7;
+  repeated Telecom telecoms = 8;
+  repeated Address addresses = 9;
+  repeated Contact contacts = 10;
+}
+
+message Patients {
+  repeated Patient all_patients = 1;
+}
