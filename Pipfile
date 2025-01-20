@@ -13,9 +13,9 @@ Hypercorn     = ">=0.17.3"
 uvicorn       = ">=0.34.0"
 httpx         = ">=0.28.1"
 
-
 [dev-packages]                  # As of 2023-12-18.
-ruff = ">=0.0.287"              # Extremely fast Python linter.  Use this as the default.
+pre-commit     = ">=4.0.1"
+ruff           = ">=0.0.287"    # Extremely fast Python linter.  Use this as the default.
 
 [requires]
 python_version = ">=3.11.5"
