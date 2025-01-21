@@ -6,8 +6,11 @@ import  time
 from    enum       import  Enum
 from    typing     import  List
 
-from    fastapi            import FastAPI, HTTPException
-from    fastapi.responses  import RedirectResponse
+from    fastapi                     import FastAPI, HTTPException
+from    fastapi.middleware.gzip     import GZipMiddleware
+#rom    fastapi.responses           import RedirectResponse
+from    brotli_asgi                 import BrotliMiddleware
+from    zstd_asgi                   import ZstdMiddleware
 
 import  model    # Our test patient data model.
 
@@ -21,6 +24,9 @@ class Size(Enum):
     HUGE    = 'huge'
 
 app = FastAPI()
+app.add_middleware( BrotliMiddleware )
+app.add_middleware( GZipMiddleware   )
+app.add_middleware( ZstdMiddleware  )
 
 @app.get("/")
 def index() -> str:

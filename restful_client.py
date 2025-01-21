@@ -8,7 +8,7 @@ import httpx    # Support HTTP/2
 
 parser = argparse.ArgumentParser(description='Request JSON data from the RESTful server.')
 
-parser.add_argument('-c',dest='comp'  ,type=str ,default='none' ,choices=['none' ,'brotli' ,'deflate' ,'gzip' ,'zstd']
+parser.add_argument('-c',dest='comp'  ,type=str ,default='none' ,choices=['none' ,'br' ,'gzip' ,'zstd']
                         ,help="compression to be used by server.  Default is 'none'.")
 parser.add_argument('-i',dest='iter'  ,type=int ,default= 10
                         ,help="request iterations to make to the server.  Default is 100.")
@@ -37,7 +37,7 @@ def run_token() -> str:
 ttl_nano_sec: int = 0
 min_nano_sec: int = ONE_NANO_SEC
 max_nano_sec: int = 0
-headers = {}  if args.comp != 'none' else {'Accept-Encoding': args.comp }
+headers = {}  if args.comp == 'none' else {'Accept-Encoding': args.comp }
 
 with open( args.logf ,'a') as file: # Python has a 8K buffer.
     file.write(f'{time.time_ns():9}\t0 Client Bgn\t{args}\n')
