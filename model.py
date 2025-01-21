@@ -8,7 +8,7 @@ from    enum       import  Enum
 from    typing     import  List ,Optional
 
 from    faker              import  Faker
-from    faker.providers    import  address ,date_time ,phone_number 
+from    faker.providers    import  address ,date_time ,phone_number
 from    pydantic           import  BaseModel ,PositiveInt
 
 class Gender(Enum):
@@ -27,7 +27,7 @@ class PhoneType(Enum):
     HOME = "Home"
     CELL = "Cell"
     WORK = "Work"
-        
+
 class Address(BaseModel):
     id: PositiveInt
     zip: str
@@ -37,7 +37,7 @@ class Address(BaseModel):
     state: str
     country: str
     type: HomeType
-    
+
 class PhoneNumber(BaseModel):
     id: PositiveInt
     number: str
@@ -65,7 +65,6 @@ class Patient(BaseModel):
     addresses: List[Address]
     phoneNumbers: List[PhoneNumber]
 
-# Pre-generate a list 1000 fake patients.
 # NOTE: DONT change the seed.
 random.seed( 101 )
 Faker.seed(  101 )
@@ -180,7 +179,7 @@ def random_contacts() -> List[Contact]:
             phoneNumbers= random_phones()
         )
         contacts.append( contact )
-    
+
     return contacts
 
 
@@ -225,6 +224,7 @@ def random_patients() -> List[Patient]:
         patients.append( patient )
     return  patients
 
+# Pre-generate a list 5000 fake patients.
 # To be reuse between RESTful and gRPC.
 patients: List[Patient] = random_patients()
 
