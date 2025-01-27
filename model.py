@@ -59,6 +59,7 @@ class Patient(BaseModel):
     deceasedOn: Optional[date]
     maritalStatus: bool
     preferredLanguage: str
+    balance: float
     activeFrom: date
     activeThru: Optional[date]
     contacts: List[Contact]
@@ -198,6 +199,7 @@ def random_patients() -> List[Patient]:
             deceasedOn      =  None,
             maritalStatus   =  True if fake.boolean() else False,
             preferredLanguage= fake.language_name(),
+            balance         =  fake.pyfloat(min_value=0.0 ,max_value=10000.0),
             activeFrom      =  fake.date(),
             activeThru      =  None,
             addresses       =  random_addresses(),

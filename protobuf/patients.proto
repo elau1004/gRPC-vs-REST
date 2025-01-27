@@ -67,18 +67,18 @@ message Patient {
     Date        deceasedOn  = 6;
     bool        maritalStatus = 7;
     string      preferredLanguage = 8;
-    Date        activeFrom  = 9;
+    float       balance     = 9;
+    Date        activeFrom  = 10;
     optional
-    Date        activeThru  = 10;
-    
+    Date        activeThru  = 11;
+
     repeated
-    Contact     contacts    = 11;
+    Contact     contacts    = 12;
     repeated
-    Address     addresses   = 12;
+    Address     addresses   = 13;
     repeated
-    PhoneNumber phoneNumbers= 13;
+    PhoneNumber phoneNumbers= 14;
 }
 
 //  SEE: https://protobuf.dev/programming-guides/techniques/#large-data
 //  SEE: https://github.com/grpc/grpc/tree/master/examples/python/compression
-
