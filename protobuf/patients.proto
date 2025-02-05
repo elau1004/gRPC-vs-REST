@@ -1,3 +1,7 @@
+//  Command to generate stubs:
+//  $   python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=.  protobuf
+
+
 syntax = "proto3";
 
 //  package model;
@@ -82,3 +86,37 @@ message Patient {
 
 //  SEE: https://protobuf.dev/programming-guides/techniques/#large-data
 //  SEE: https://github.com/grpc/grpc/tree/master/examples/python/compression
+
+
+enum    SizeType {
+    FULL    = 0;
+    SMALL   = 1;
+    MEDIUM  = 3;
+    LARGE   = 4;
+    HUGE    = 5;
+}
+
+message PatientRequest {
+    string      runToken    = 1;
+    string      dataSize    = 2;
+    int32       patientId   = 3;
+}
+
+message PatientResponse {
+    repeated    Patient     =   1;
+}
+
+// Patient service definition.
+service PatientService {
+    //  Unary
+    rpc TestPatient( PatientRequest ) returns( PatientResponse );
+
+//
+//  //  Server streaming
+//  rpc ServerStreaming( PatientRequest ) returns(stream PatientResponse );
+//  //  Client streaming
+//  rpc ClientStreaming( stream PatientRequest ) returns( PatientResponse );
+//  //  Bidirectional streaming
+//  rpc BidirectionStreaming(stream PatientRequest ) returns( stream PatientResponse );
+//
+}
