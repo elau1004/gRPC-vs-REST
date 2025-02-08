@@ -7,21 +7,23 @@ name = "pypi"
 python-dotenv = ">=1.0.1"
 Faker         = ">=33.3.1"
 fastapi       = ">=0.115.6"
+orjson        = ">=3.10.15"
+grpcio        = ">=1.69.0"
 grpcio-tools  = ">=1.70.0"
-brotli-asgi   = ">=1.4.0"
-zstd-asgi     = ">=0.2"
+protobuf-tools= ">=0.0.2"
 Hypercorn     = ">=0.17.3"
 uvicorn       = ">=0.34.0"
-grpcio        = ">=1.69.0"
 httpx         = ">=0.28.1"
-protobuf-tools= ">=0.0.2"
+brotli-asgi   = ">=1.4.0"
+zstd          = ">=1.5.6.2"
+zstd-asgi     = ">=0.2"
 
 [dev-packages]                  # As of 2023-12-18.
 pre-commit     = ">=4.0.1"
 ruff           = ">=0.0.287"    # Extremely fast Python linter.  Use this as the default.
 
 [requires]
-python_version = ">=3.11.5"
+python_version = "3.12.9"
 
 [scripts]
 helloworld = "python -c \"print('Hello World. Ran from: pipenv run helloworld')\""

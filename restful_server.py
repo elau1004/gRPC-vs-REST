@@ -1,6 +1,7 @@
 """
 The RESTful server to serve out our test patient data.
 """
+import  os
 import  time
 
 from    enum       import  Enum
@@ -44,7 +45,10 @@ def get_patient( patient_id: int ) -> model.Patient:
 
 @app.get("/patients/")
 def get_patients( runtoken: str = None ,datasize: str = None ) -> List[model.Patient]:
-    with open(f'logs/restful_server.log', 'a') as file:   # Python has a 8K buffer.
+    logfile = 'logs/restful_server.log'
+
+    os.makedirs( os.path.dirname( logfile ) ,exist_ok=True )
+    with open( logfile ,'a' ) as file:   # Python has a 8K buffer.
         file.write(f'{time.time_ns():9}\t3 Server Rcv\t{runtoken}\n')
         end: int = 1
         match datasize: # The following sizes are obtained from inspecting the traffic in the browser.
