@@ -29,10 +29,10 @@ args = parser.parse_args()
 #   hypercorn restful_server:app --reload
 #
 # Client:
-#   python restful_client.py medium         # No     compression
-#   python restful_client.py medium -c br   # Brotli compression
-#   python restful_client.py medium -c gzip # Gzip   compression
-#   python restful_client.py medium -c zstd # Zstd   compression
+#   python restful_client.py -s medium         # No     compression
+#   python restful_client.py -s medium -c br   # Brotli compression
+#   python restful_client.py -s medium -c gzip # Gzip   compression
+#   python restful_client.py -s medium -c zstd # Zstd   compression
 #
 # Browser:
 #   http://127.0.0.1:8000/patients/?datasize=medium
@@ -88,7 +88,7 @@ with open( args.logf ,'a') as file: # Python has a 8K buffer.
             # Calculate the time taken to receive the data.
             elp_nano_sec = time.time_ns() - bgn_nano_sec
             elp_msec     = elp_nano_sec   / 1_000_000.0 # Convert nano into milli second.
-            file.write( f'{time.time_ns():19}\t7 Client Rcv\t{runtoken}\tRcv {r.num_bytes_downloaded:>8} bytes in {elp_msec:7.3f} ms over {r.http_version}\n')
+            file.write( f'{time.time_ns():19}\t7 Client Rcv\t{runtoken}\tRcv {r.num_bytes_downloaded:>8} bytes in {elp_msec:7.3f} ms over  {r.http_version}\n')
 
             # Accumulate the statistics.
             ttl_bytes   += len(r.text)
@@ -102,8 +102,9 @@ with open( args.logf ,'a') as file: # Python has a 8K buffer.
             bgn_nano_sec = time.time_ns()
             _ = orjson.loads( r.text )
             elp_nano_sec = time.time_ns() - bgn_nano_sec
+            elp_msc1     = elp_msec if elp_msec > 0 else 0.0001
             elp_msec     = elp_nano_sec   / 1_000_000.0 # Convert nano into millisecond.
-            file.write( f'{time.time_ns():19}\t8 Client Rcv\t{runtoken}\tJsn {len(r.text):>8} bytes in {elp_msec:7.3f} ms\n')
+            file.write( f'{time.time_ns():19}\t8 Client Rcv\t{runtoken}\tJsn {len(r.text):>8} bytes in {elp_msec:7.3f} ms ({(len(r.text)/r.num_bytes_downloaded):3.2f} S  {(elp_msec/elp_msc1):3.2f} J)\n')
 
     file.write( f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
     print(      f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
