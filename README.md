@@ -3,7 +3,15 @@
 ## Overview
 This section presents the conclusions drawn from the tests conducted on gRPC and REST.
 
-## Test Setup
+## Environment setup
+The following are the commands to setup this project.
+```
+pip    install pipenv
+git    clone   https://github.com/elau1004/gRPC-vs-REST.git
+pipenv sync
+```
+
+## Test setup
 The tests are ran with the following combinations of options:
 * **Protocol**: `HTTP/1` ,`HTTP/2`
 * **Data Size**: `full` <small>(~1.1Kb)</small> ,`small` <small>(~9.9Kb)</small> ,`medium` <small>(~107Kb)</small> ,`large` <small>(~1.1Mb)</small> ,`huge` <small>(~11Mb)</small>
@@ -94,7 +102,21 @@ The following is the result of the average response time for each of the above m
 ### gRPC with serializing protobuf into JSON
 |Protocol|Size  |Compression|Avg Resp|Comment|
 |:-------|:-----|:----------|-------:|:------|
-|        |      |           |        |       |
+| http/2 |full  |           |        |       |
+| http/2 |full  | deflate   |        |       |
+| http/2 |full  | gzip      |        |       |
+| http/2 |small |           |        |       |
+| http/2 |small | deflate   |        |       |
+| http/2 |small | gzip      |        |       |
+| http/2 |medium|           |        |       |
+| http/2 |medium| deflate   |        |       |
+| http/2 |medium| gzip      |        |       |
+| http/2 |large |           |        |       |
+| http/2 |large | deflate   |        |       |
+| http/2 |large | gzip      |        |       |
+| http/2 |huge  |           |        |       |
+| http/2 |huge  | deflate   |        |       |
+| http/2 |huge  | gzip      |        |       |
 
 #### gRPC conclusion
 * 
