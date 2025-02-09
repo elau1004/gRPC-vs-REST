@@ -6,6 +6,7 @@ import os
 import time
 
 import httpx    # Support HTTP/2
+import orjson
 
 parser = argparse.ArgumentParser(description='Request JSON data from the RESTful server.')
 
@@ -77,16 +78,19 @@ with open( args.logf ,'a') as file: # Python has a 8K buffer.
     with  httpx.Client( base_url=f'{args.proto}://{args.host}', headers=headers ,http2=True ,verify=False) as client:
         for i in  range( args.iter ):
             runtoken = run_token()
-            bgn_nano_sec = time.time_ns()
             file.write( f'{time.time_ns():9}\t1 Client Req\t{runtoken}\n')
+            bgn_nano_sec = time.time_ns()
 
+            # Request the data from the server.
 #           r = client.get( '/patients/3' )
             r = client.get(f'/patients/?runtoken={runtoken}&datasize={args.size}')
 
+            # Calculate the time taken to receive the data.
             elp_nano_sec = time.time_ns() - bgn_nano_sec
             elp_msec     = elp_nano_sec   / 1_000_000.0 # Convert nano into milli second.
-            file.write( f'{time.time_ns():19}\t7 Client Rcv\t{runtoken}\t{r.num_bytes_downloaded:>8} bytes in {elp_msec:7.2f}ms over {r.http_version}\n')
+            file.write( f'{time.time_ns():19}\t7 Client Rcv\t{runtoken}\tRcv {r.num_bytes_downloaded:>8} bytes in {elp_msec:7.3f} ms over {r.http_version}\n')
 
+            # Accumulate the statistics.
             ttl_bytes   += len(r.text)
             ttl_nano_sec+= elp_nano_sec
             if  min_nano_sec > elp_nano_sec:
@@ -94,5 +98,12 @@ with open( args.logf ,'a') as file: # Python has a 8K buffer.
             if  max_nano_sec < elp_nano_sec:
                 max_nano_sec = elp_nano_sec
 
-    file.write( f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>5.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
-    print(      f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>5.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
+            # Serialize the JSON data.
+            bgn_nano_sec = time.time_ns()
+            _ = orjson.loads( r.text )
+            elp_nano_sec = time.time_ns() - bgn_nano_sec
+            elp_msec     = elp_nano_sec   / 1_000_000.0 # Convert nano into millisecond.
+            file.write( f'{time.time_ns():19}\t8 Client Rcv\t{runtoken}\tJsn {len(r.text):>8} bytes in {elp_msec:7.3f} ms\n')
+
+    file.write( f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
+    print(      f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
