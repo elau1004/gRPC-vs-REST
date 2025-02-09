@@ -6,6 +6,7 @@ This section presents the conclusions drawn from the tests conducted on gRPC and
 ## Environment setup
 The following are the commands to setup this project.
 ```
+pip    install -U pip
 pip    install pipenv
 git    clone   https://github.com/elau1004/gRPC-vs-REST.git
 pipenv sync
