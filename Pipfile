@@ -23,7 +23,7 @@ pre-commit     = ">=4.0.1"
 ruff           = ">=0.0.287"    # Extremely fast Python linter.  Use this as the default.
 
 [requires]
-python_version = ">=3.12.5"
+python_version = "3.12.9"
 
 [scripts]
 helloworld = "python -c \"print('Hello World. Ran from: pipenv run helloworld')\""

@@ -1,50 +1,127 @@
-# API-Service-Example
-An API Service example.
+# Test Conclusion
 
-## References:
-### General
-* https://roadmap.sh/
-### FastAPI
-* https://github.com/tiangolo/full-stack-fastapi-postgresql
-### RestFul
-* RESTful API: https://restfulapi.net/
-* HTTP response codes: https://restfulapi.net/http-status-codes/
-* https://www.youtube.com/watch?v=Puvr82Cm26o
-* https://dev.to/_staticvoid/the-complete-guide-to-status-codes-for-meaningful-rest-apis-1-5c5
-### HTTP client
-* https://medium.com/swlh/how-to-boost-your-python-apps-using-httpx-and-asynchronous-calls-9cfe6f63d6ad
-* https://medium.com/python-pandemonium/how-to-serve-http-2-using-python-5e5bbd1e7ff1
-* https://medium.com/gitconnected/deploy-fastapi-with-hypercorn-http-2-asgi-8cfc304e9e7a
-### gRPC
-* https://grpc.io/docs/what-is-grpc/introduction/
-### GraphQL
-* https://nordicapis.com/graphql-documentation-generators-explorers-and-tools/
-### Test data generator
-* https://learnpython.com/blog/generate-test-data-in-python/
-* https://www.activestate.com/blog/top-10-python-packages-for-creating-synthetic-data/
-### Security
-* https://youtu.be/7UBm8QFTaq0?t=259
-* https://www.openpolicyagent.org/docs/latest/ecosystem/#
-* https://infisical.com/docs/documentation/getting-started/introduction
-### Logging
-* https://www.toptal.com/python/in-depth-python-logging
-### Caching
-* https://dzone.com/articles/process-caching-vs-distributed
-### Serialization/Deserialization
-* https://pymotw.com/2/pickle/
-* https://github.com/kochelmonster/larch-pickle
-* https://ray-project.github.io/2017/10/15/fast-python-serialization-with-ray-and-arrow.html
-### Networking
-* https://www.howtogeek.com/devops/how-to-run-multiple-docker-containers-on-different-ip-addresses/
-* https://pymotw.com/2/socket/multicast.html
-* https://www.geeksforgeeks.org/what-is-mtumaximum-transmission-unit/
-### Container
-* https://www.redhat.com/sysadmin/podman-docker-compose
-### Concurrency
-* https://gotocon.com/dl/jaoo-aarhus-2010/slides/JohnHughes_TestingAsynchronousBehaviourInAnInstantMessagingServer.pdf
-### ERP
-* https://opensource.com/tools/enterprise-resource-planning
-### Postgresql
-* https://subscription.packtpub.com/book/big-data-and-business-intelligence/9781849516969/8/ch08lvl1sec108/tweaking-xfs-performance
-### Project setup
-* https://github.com/carlosperate/awesome-pyproject
+## Overview
+This section presents the conclusions drawn from the tests conducted on gRPC and REST.
+
+## Environment setup
+The following are the commands to setup this project.
+```
+pip    install -U pip
+pip    install pipenv
+git    clone   https://github.com/elau1004/gRPC-vs-REST.git
+pipenv sync
+```
+
+## Test setup
+The tests are ran with the following combinations of options:
+* **Protocol**: `HTTP/1` ,`HTTP/2`
+* **Data Size**: `full` <small>(~1.1Kb)</small> ,`small` <small>(~9.9Kb)</small> ,`medium` <small>(~107Kb)</small> ,`large` <small>(~1.1Mb)</small> ,`huge` <small>(~11Mb)</small>
+* **Compression**: `None` ,`gzip` , `br` ,`zstd`
+
+with the following command:
+```
+python  restful_client.py  -i 1000  -p ppp  -s sss  -c ccc
+```
+
+where the command line options are:
+|Option|Default|Description|
+|------|:-----:|:----------|
+| `-i` | 100   |Number of request to make to the server.|
+| `-p` | `http`|The protocol to use. [`http` ,`https`]| 
+| `-s` | `full`|The size of the data message to respond back by the server. [`full` ,`small` ,`medium` ,`large` ,`huge`]| 
+| `-c` | *None*|Compression algorithm to use. [`br` ,`gzip` ,`zstd`]| 
+
+Depending on which protocol to be used, the server need to be started with different CLI option.
+
+When testing with protocol HTTP/**1**, the server need to be started with the following command:
+```
+hypercorn  restful_server:app
+```
+
+When testing with protocol HTTP/**2**, first you need to generate the security key and certificate.  The following command can be used to generate these files:
+```
+openssl req -x509 -newkey rsa:4096 -sha256 -days 5000 -nodes -keyout key.pem -out cert.pem -subj "/CN=example.com"  -addext "subjectAltName=DNS:example.com,DNS:*.example.com,IP:10.0.0.1"
+```
+
+Once both `key.pem` and `cert.pem` are generated, the server need to be started with the following command:
+```
+hypercorn  --keyfile key.pem  --certfile cert.pem  restful_server:app
+```
+
+## Test Results
+The following is the result of the average response time for each of the above mentioned combination of options.
+
+### REST with serializing text into JSON
+|Protocol|Size  |Compression|Avg Resp|Comment|
+|:-------|:-----|:----------|-------:|:------|
+| http/1 |full  |           |        |       |
+| http/1 |full  | gzip      |        |       |
+| http/1 |full  | brotli    |        |       |
+| http/1 |full  | zstd      |        |       |
+| http/1 |small |           |        |       |
+| http/1 |small | gzip      |        |       |
+| http/1 |small | brotli    |        |       |
+| http/1 |small | zstd      |        |       |
+| http/1 |medium|           |        |       |
+| http/1 |medium| gzip      |        |       |
+| http/1 |medium| brotli    |        |       |
+| http/1 |medium| zstd      |        |       |
+| http/1 |large |           |        |       |
+| http/1 |large | gzip      |        |       |
+| http/1 |large | brotli    |        |       |
+| http/1 |large | zstd      |        |       |
+| http/1 |huge  |           |        |       |
+| http/1 |huge  | gzip      |        |       |
+| http/1 |huge  | brotli    |        |       |
+| http/1 |huge  | zstd      |        |       |
+|        |      |           |        |       |
+| http/2 |full  |           |        |       |
+| http/2 |full  | gzip      |        |       |
+| http/2 |full  | brotli    |        |       |
+| http/2 |full  | zstd      |        |       |
+| http/2 |small |           |        |       |
+| http/2 |small | gzip      |        |       |
+| http/2 |small | brotli    |        |       |
+| http/2 |small | zstd      |        |       |
+| http/2 |medium|           |        |       |
+| http/2 |medium| gzip      |        |       |
+| http/2 |medium| brotli    |        |       |
+| http/2 |medium| zstd      |        |       |
+| http/2 |large |           |        |       |
+| http/2 |large | gzip      |        |       |
+| http/2 |large | brotli    |        |       |
+| http/2 |large | zstd      |        |       |
+| http/2 |huge  |           |        |       |
+| http/2 |huge  | gzip      |        |       |
+| http/2 |huge  | brotli    |        |       |
+| http/2 |huge  | zstd      |        |       |
+
+#### REST conclusion
+* 
+* 
+
+### gRPC with serializing protobuf into JSON
+|Protocol|Size  |Compression|Avg Resp|Comment|
+|:-------|:-----|:----------|-------:|:------|
+| http/2 |full  |           |        |       |
+| http/2 |full  | deflate   |        |       |
+| http/2 |full  | gzip      |        |       |
+| http/2 |small |           |        |       |
+| http/2 |small | deflate   |        |       |
+| http/2 |small | gzip      |        |       |
+| http/2 |medium|           |        |       |
+| http/2 |medium| deflate   |        |       |
+| http/2 |medium| gzip      |        |       |
+| http/2 |large |           |        |       |
+| http/2 |large | deflate   |        |       |
+| http/2 |large | gzip      |        |       |
+| http/2 |huge  |           |        |       |
+| http/2 |huge  | deflate   |        |       |
+| http/2 |huge  | gzip      |        |       |
+
+#### gRPC conclusion
+* 
+* 
+
+## Conclusion
+Summarize the key findings from the test results and provide recommendations based on the performance, resource utilization, and scalability of gRPC and REST.
