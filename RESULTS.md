@@ -4,10 +4,10 @@ The following is the result of the average response time for each of the above m
 
 ```
 Lenovo T490s laptop                 Air Mac                     AWS EC2
-    O/S:    Windows 11 Pro              O/S:                        O/S:    Linux
-    CPU:    Intel i5-8365, 4 cores      CPU:    M4                  CPU:    
-    Clock:  1.6 GHz - 4.80 GHz          Clock:                      Clock:  
-    RAM:    16 Gib                      RAM:                        RAM:    
+    O/S:    Windows 11 Pro              O/S:    iOS                 O/S:    Linux
+    CPU:    Intel i5-8365, 4 cores      CPU:    M2, 8 cores         CPU:    
+    Clock:  1.6 GHz - 4.80 GHz          Clock:  2.4 GHz - 3.5 GHz   Clock:  
+    RAM:    16 Gib                      RAM:    16Gib               RAM:    
 ```
 * On our test laptops:
     * Both anti virus scan and network are disabled.
@@ -93,47 +93,47 @@ for s in full small medium large huge; do {
 
 |Lvl|Size  |Compression|  Win H1|  Win H2| Mac H1| Mac H2|
 |:-:|:-----|:----------|-------:|-------:|------:|------:|
-| 3 |full  |           |    2.52|    3.58|
-| 3 |full  | br        |    2.86|    4.46|
-| 3 |full  | gzip      |    3.79|    3.96|
-| 3 |full  | zstd      |    3.92|    9.45|
-| 3 |small |           |    4.35|   10.48|
-| 3 |small | br        |    4.48|   12.14|
-| 3 |small | gzip      |    4.77|    5.14|
-| 3 |small | zstd      |    4.90|    8.89|
-| 3 |medium|           |    6.46|   21.27|
-| 3 |medium| br        |    6.02|   21.90|
-| 3 |medium| gzip      |    5.94|    8.31|
-| 3 |medium| zstd      |    5.60|   10.81|
-| 3 |large |           |   12.94|   37.42|
-| 3 |large | br        |   12.49|   37.62|
-| 3 |large | gzip      |   13.61|   28.60|
-| 3 |large | zstd      |   11.88|   18.51|
-| 3 |huge  |           |   90.88|  167.29|
-| 3 |huge  | br        |   96.64|  189.43|
-| 3 |huge  | gzip      |  112.36|  200.62|
-| 3 |huge  | zstd      |   88.76|  109.49|
-| 4 |full  |           |    2.53|        |
-| 4 |full  | br        |    2.44|        |
-| 4 |full  | gzip      |    2.44|        |
-| 4 |full  | zstd      |    3.10|        |
-| 4 |small |           |    3.27|        |
-| 4 |small | br        |    3.12|        |
-| 4 |small | gzip      |    2.96|        |
-| 4 |small | zstd      |    3.51|        |
-| 4 |medium|           |    5.77|        |
-| 4 |medium| br        |    6.17|        |
-| 4 |medium| gzip      |    6.12|        |
-| 4 |medium| zstd      |    4.75|        |
-| 4 |large |           |    9.20|        |
-| 4 |large | br        |    9.24|        |
-| 4 |large | gzip      |   10.18|        |
-| 4 |large | zstd      |   12.37|        |
-| 4 |huge  |           |   66.58|        |
-| 4 |huge  | br        |   64.69|        |
-| 4 |huge  | gzip      |   81.88|        |
-| 4 |huge  | zstd      |   70.48|        |
-| 5 |full  |           |    3.07|        |
+| 3 |full  |           |    2.52|    4.51|
+| 3 |full  | br        |    2.86|    4.42|
+| 3 |full  | gzip      |    3.79|    4.46|
+| 3 |full  | zstd      |    3.92|    4.69|
+| 3 |small |           |    4.35|    4.91|
+| 3 |small | br        |    4.48|    4.76|
+| 3 |small | gzip      |    4.77|    5.09|
+| 3 |small | zstd      |    4.90|    5.30|
+| 3 |medium|           |    6.46|    6.87|
+| 3 |medium| br        |    6.02|    6.69|
+| 3 |medium| gzip      |    5.94|    6.96|
+| 3 |medium| zstd      |    5.60|    6.75|
+| 3 |large |           |   12.94|   13.49|
+| 3 |large | br        |   12.49|   13.43|
+| 3 |large | gzip      |   13.61|   14.85|
+| 3 |large | zstd      |   11.88|   12.80|
+| 3 |huge  |           |   90.88|   85.63|
+| 3 |huge  | br        |   96.64|   19.27|
+| 3 |huge  | gzip      |  112.36|   88.48|
+| 3 |huge  | zstd      |   88.76|   71.26|
+| 4 |full  |           |    2.53|   10.80|
+| 4 |full  | br        |    2.44|   10.31|
+| 4 |full  | gzip      |    2.44|   11.62|
+| 4 |full  | zstd      |    3.10|   12.92|
+| 4 |small |           |    3.27|   11.88|
+| 4 |small | br        |    3.12|   11.67|
+| 4 |small | gzip      |    2.96|   11.49|
+| 4 |small | zstd      |    3.51|   13.02|
+| 4 |medium|           |    5.77|   15.90|
+| 4 |medium| br        |    6.17|   15.07|
+| 4 |medium| gzip      |    6.12|   17.33|
+| 4 |medium| zstd      |    4.75|   15.45|
+| 4 |large |           |    9.20|   28.95|
+| 4 |large | br        |    9.24|   28.84|
+| 4 |large | gzip      |   10.18|   31.24|
+| 4 |large | zstd      |   12.37|   18.11|
+| 4 |huge  |           |   66.58|   87.03|
+| 4 |huge  | br        |   64.69|   79.95|
+| 4 |huge  | gzip      |   81.88|   83.68|
+| 4 |huge  | zstd      |   70.48|   67.81|
+| 5 |full  |           |    3.07|    4.29|
 | 5 |full  | br        |    3.51|        |
 | 5 |full  | gzip      |    2.62|        |
 | 5 |full  | zstd      |    4.66|        |

@@ -24,7 +24,7 @@ class Size(Enum):
     LARGE   = 'large'
     HUGE    = 'huge'
 
-lvl = os.environ.get('COMPRESSION_LEVEL' ,4)
+lvl = os.environ.get('COMPRESSION_LEVEL' ,5)
 app = FastAPI()
 app.add_middleware( BrotliMiddleware,quality=lvl,gzip_fallback=False )  # Default: quality=4 
 app.add_middleware( ZstdMiddleware  ,level=lvl  ,gzip_fallback=False )  # Default: level=3 ,threads=2
