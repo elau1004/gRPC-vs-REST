@@ -188,7 +188,7 @@ def random_patients() -> List[Patient]:
     global patient_id
     patients: List[Patient] = list()
 
-    for i in range( 5000 ):
+    for i in range( 1000 ):
         patient_id = i+1
         patient = Patient(
             id              =  patient_id,

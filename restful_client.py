@@ -72,21 +72,23 @@ headers = {}  if args.comp == 'none' else {'Accept-Encoding': args.comp }
 
 os.makedirs( os.path.dirname( args.logf ) ,exist_ok=True )
 with open( args.logf ,'a') as file: # Python has a 8K buffer.
-    file.write( f'{time.time_ns():9}\t0 Client Bgn\t{args}\n')
+#   file.write( f'{time.time_ns():9}\t0 Client Bgn\t{args}\n')
     print(      f'{time.time_ns():9}\t0 Client Bgn\t{args}')
 
     with  httpx.Client( base_url=f'{args.proto}://{args.host}', headers=headers ,http2=True ,verify=False) as client:
         for i in  range( args.iter ):
             runtoken = run_token()
-            file.write( f'{time.time_ns():9}\t1 Client Req\t{runtoken}\n')
-            bgn_nano_sec = time.time_ns()
+#           file.write( f'{time.time_ns():9}\t1 Client Req\t{runtoken}\n')
+            bgn_nano_sec = time.perf_counter_ns()
+#           bgn_nano_sec = time.time_ns()
 
             # Request the data from the server.
 #           r = client.get( '/patients/3' )
             r = client.get(f'/patients/?runtoken={runtoken}&datasize={args.size}')
 
             # Calculate the time taken to receive the data.
-            elp_nano_sec = time.time_ns() - bgn_nano_sec
+            elp_nano_sec = time.perf_counter_ns() - bgn_nano_sec
+#           elp_nano_sec = time.time_ns() - bgn_nano_sec
             elp_msec     = elp_nano_sec   / 1_000_000.0 # Convert nano into milli second.
             file.write( f'{time.time_ns():19}\t7 Client Rcv\t{runtoken}\tRcv {r.num_bytes_downloaded:>8} bytes in {elp_msec:7.3f} ms over  {r.http_version}\n')
 
@@ -99,12 +101,14 @@ with open( args.logf ,'a') as file: # Python has a 8K buffer.
                 max_nano_sec = elp_nano_sec
 
             # Serialize the JSON data.
-            bgn_nano_sec = time.time_ns()
+            bgn_nano_sec = time.perf_counter_ns()
+#           bgn_nano_sec = time.time_ns()
             _ = orjson.loads( r.text )
-            elp_nano_sec = time.time_ns() - bgn_nano_sec
+            elp_nano_sec = time.perf_counter_ns() - bgn_nano_sec
+#           elp_nano_sec = time.time_ns() - bgn_nano_sec
             elp_msc1     = elp_msec if elp_msec > 0 else 0.0001
             elp_msec     = elp_nano_sec   / 1_000_000.0 # Convert nano into millisecond.
-            file.write( f'{time.time_ns():19}\t8 Client Rcv\t{runtoken}\tJsn {len(r.text):>8} bytes in {elp_msec:7.3f} ms ({(len(r.text)/r.num_bytes_downloaded):3.2f} S  {(elp_msec/elp_msc1):3.2f} J)\n')
+#           file.write( f'{time.time_ns():19}\t8 Client Rcv\t{runtoken}\tJsn {len(r.text):>8} bytes in {elp_msec:7.3f} ms ({(len(r.text)/r.num_bytes_downloaded):3.2f} S  {(elp_msec/elp_msc1):3.2f} J)\n')
 
-    file.write( f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
+#   file.write( f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
     print(      f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
