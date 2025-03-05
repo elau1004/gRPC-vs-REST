@@ -22,6 +22,8 @@ parser.add_argument('-s',dest='size'    ,type=str ,default='full' ,choices=['ful
                         ,help="size of the data.  Default is 'full'.")
 parser.add_argument('-p',dest='proto'   ,type=str ,default='http' ,choices=['http' ,'https']
                         ,help="protocol to use.  Default is 'http/1'.")
+parser.add_argument('-u',dest='url'     ,type=str
+                        ,help="base url to use.")
 args = parser.parse_args()
 
 # HTTP/1 testing.
@@ -65,6 +67,7 @@ def run_token() -> str:
 
 # Main section
 ttl_bytes:    int = 0
+ttl_chars:    int = 0
 ttl_nano_sec: int = 0
 min_nano_sec: int = ONE_NANO_SEC
 max_nano_sec: int = 0
@@ -75,7 +78,8 @@ with open( args.logf ,'a') as file: # Python has a 8K buffer.
 #   file.write( f'{time.time_ns():9}\t0 Client Bgn\t{args}\n')
     print(      f'{time.time_ns():9}\t0 Client Bgn\t{args}')
 
-    with  httpx.Client( base_url=f'{args.proto}://{args.host}', headers=headers ,http2=True ,verify=False) as client:
+    base_url = args.url if args.url else f'{args.proto}://{args.host}'
+    with  httpx.Client( base_url=base_url ,headers=headers ,http2=True ,verify=False) as client:
         for i in  range( args.iter ):
             runtoken = run_token()
 #           file.write( f'{time.time_ns():9}\t1 Client Req\t{runtoken}\n')
@@ -91,7 +95,8 @@ with open( args.logf ,'a') as file: # Python has a 8K buffer.
             file.write( f'{time.time_ns():19}\t7 Client Rcv\t{runtoken}\tRcv {r.num_bytes_downloaded:>8} bytes in {elp_msec:7.3f} ms over  {r.http_version}\n')
 
             # Accumulate the statistics.
-            ttl_bytes   += len(r.text)
+            ttl_bytes   += r.num_bytes_downloaded
+            ttl_chars   += len(r.text)
             ttl_nano_sec+= elp_nano_sec
             if  min_nano_sec > elp_nano_sec:
                 min_nano_sec = elp_nano_sec
@@ -106,5 +111,5 @@ with open( args.logf ,'a') as file: # Python has a 8K buffer.
             elp_msec     = elp_nano_sec   / 1_000_000.0 # Convert nano into millisecond.
 #           file.write( f'{time.time_ns():19}\t8 Client Rcv\t{runtoken}\tJsn {len(r.text):>8} bytes in {elp_msec:7.3f} ms ({(len(r.text)/r.num_bytes_downloaded):3.2f} S  {(elp_msec/elp_msc1):3.2f} J)\n')
 
-#   file.write( f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
-    print(      f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_bytes/(i+1)}b\n')
+#   file.write( f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_chars/(i+1)}b  Trnf: {ttl_bytes/(i+1)}b\n')
+    print(      f'{time.time_ns():9}\t9 Client End\tMin: {min_nano_sec/1_000_000.0:>5.2f}ms  Avg: {ttl_nano_sec/1_000_000.0/args.iter:>5.2f}ms  Max: {max_nano_sec/1_000_000.0:>6.2f}ms  Size: {ttl_chars/(i+1)}b  Trnf: {ttl_bytes/(i+1)}b\n')

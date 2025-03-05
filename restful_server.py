@@ -24,8 +24,11 @@ class Size(Enum):
     LARGE   = 'large'
     HUGE    = 'huge'
 
-lvl = os.environ.get('COMPRESSION_LEVEL' ,5)
+lvl = int(os.environ.get('COMPRESSION_LEVEL' ,'5'))
 app = FastAPI()
+# Even though the client sent up 'Accept-Encoding': none, the server will default to brotli.
+# To test for NO compression, comment out the below middleware.
+#
 app.add_middleware( BrotliMiddleware,quality=lvl,gzip_fallback=False )  # Default: quality=4 
 app.add_middleware( ZstdMiddleware  ,level=lvl  ,gzip_fallback=False )  # Default: level=3 ,threads=2
 app.add_middleware( GZipMiddleware  ,compresslevel=lvl               )  # Default: compresslevel=9
