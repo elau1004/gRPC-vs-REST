@@ -7,7 +7,7 @@ Lenovo T490s laptop                 Air Mac                     AWS EC2
     O/S:    Windows 11 Pro              O/S:    iOS                 O/S:    Linux
     CPU:    Intel i5-8365, 4 cores      CPU:    M2, 8 cores         CPU:    
     Clock:  1.6 GHz - 4.80 GHz          Clock:  2.4 GHz - 3.5 GHz   Clock:  
-    RAM:    16 Gib                      RAM:    16Gib               RAM:    
+    RAM:    16 Gib                      RAM:    16 Gib              RAM:    
 ```
 * On our test laptops:
     * Both anti virus scan and network are disabled.
@@ -39,38 +39,47 @@ When testing with protocol HTTP/**1**, the server need to be started with the fo
 hypercorn  restful_server:app
 ```
 
-When testing with protocol HTTP/**2**, first you need to generate the security key and certificate.  The following command can be used to generate these files:
+When testing with protocol HTTP/**2**, first you need to generate the security key and certificate.  Most major web browser only support HTTP/**2** over encrypted connection, making encryption essentially mandatory.  The following command can be used to generate these files:
 ```
-openssl req -x509 -newkey rsa:4096 -sha256 -days 5000 -nodes -keyout key.pem -out cert.pem -subj "/CN=example.com"  -addext "subjectAltName=DNS:example.com,DNS:*.example.com,IP:10.0.0.1"
+openssl req -x509 -newkey rsa:4096 -sha256 -days 5000 -nodes -keyout key.pem -out cert.pem \
+            -subj "/CN=example.com" -addext "subjectAltName=DNS:example.com,DNS:*.example.com,IP:10.0.0.1"
 ```
 
 Once both `key.pem` and `cert.pem` are generated, the server need to be started with the following command:
-```
+```batch
+::  Windows
+SET COMPRESSION_LEVEL=5
 hypercorn  --keyfile key.pem  --certfile cert.pem  restful_server:app
 ```
 
-### Command use to return the test:
-```batch
-:: Windows
-for %s in ( full small medium large huge ) do ( 
-    for %c in ( none br gzip zstd ) do ( 
-        for %p in ( http https ) do (
-            for %i in ( 1 2 3 ) do ( 
-                python restful_client.py -i 1000 -s %s -c %c -p %p  & del logs\*.log
-            )
-        )
-    )
-)
+You could run the server app in either 2 different terminals to listen on different ports for different protocol or run them in the background and manage them yourself.
+```bash
+#   Bash
+export  COMPRESSION_LEVEL=5
+hypercorn  restful_server:app --bind 0.0.0.0:8000 &
+hypercorn  restful_server:app --bind 0.0.0.0:8443 --keyfile key.pem --certfile cert.pem &
 ```
 
+### Terminal script used to run the test:
+You should test both `HTTP/1` and `HTTP/2` as close to each other to yield results that are closer together in time.
+```batch
+:: Windows with 2 instances of the restful server.
+for %s in ( full small medium large huge ) do (
+    for %c in ( none br gzip zstd ) do (
+        for %u in ( http://127.0.0.1:8000  https://127.0.0.1:8443 ) do (
+            for %i in ( 1 2 3 ) do (
+                @del   logs\*.log
+                python restful_client.py -i 1000 -s %s -c %c -u %u  ))))
+```
 ```bash
-#  Bash
+#  Bash with 2 instances of the restful server.
 for s in full small medium large huge; do {
     for c in  none  br gzip zstd; do {
-        for p in http https; do {
+        for u in  'http://127.0.0.1:8000'  'https://127.0.0.1:8443'; do {
             for i  in 1 2 3; do {
-                echo    restful_client.py -i 1000 -s $s -c $c -p $p
-                python  restful_client.py -i 1000 -s $s -c $c -p $p  && rm logs/*.log
+                rm      logs/*.log
+                echo    restful_client.py -i 1000 -s $s -c $c -u $u
+                python  restful_client.py -i 1000 -s $s -c $c -u $u
             };  done
         };  done
     };  done
@@ -80,100 +89,131 @@ for s in full small medium large huge; do {
 * For each combination, we run it three times and pick the middle number.
 * The compression level is manually changed in the `restful_server.py` script.
 
+
 ### RESTful JSON data serialized into Python dictionary
 |Caption      | Description|
 |:------------|:-----------|
 | Lvl         | Compression level. [1-9]|
 | Size        | Size of the requested JSON data. `full` <small>(~1Kb)</small> ,`small` <small>(~8Kb)</small> ,`medium` <small>(~32Kb)</small> ,`large` <small>(~135Kb)</small> ,`huge` <small>(~1Mb)</small>|
 | Compression | The type of compression used.  `none` ,`br` , `gzip` ,`zstd`|
+| Msg Size    | The uncompress message size.|
+| Trf Size    | The transferred message size.|
+| Ratio       | The compression ration.|
 | Win H1      | Tested on Windows 11 using `HTTP/1.1` measured in ms.|
 | Win H2      | Tested on Windows 11 using `HTTP/2` measured in ms.|
+| Win H3      | Tested on Windows 11 using `HTTP/3` measured in ms.|
 | AWS H1      | Tested in the cloud using `HTTP/1.1` measured in ms.|
 | AWS H2      | Tested in the cloud using `HTTP/2` measured in ms.|
+| AWS H3      | Tested in the cloud using `HTTP/3` measured in ms.|
 
-|Lvl|Size  |Compression|  Win H1|  Win H2| Mac H1| Mac H2|
-|:-:|:-----|:----------|-------:|-------:|------:|------:|
-| 3 |full  |           |    2.52|    4.51|
-| 3 |full  | br        |    2.86|    4.42|
-| 3 |full  | gzip      |    3.79|    4.46|
-| 3 |full  | zstd      |    3.92|    4.69|
-| 3 |small |           |    4.35|    4.91|
-| 3 |small | br        |    4.48|    4.76|
-| 3 |small | gzip      |    4.77|    5.09|
-| 3 |small | zstd      |    4.90|    5.30|
-| 3 |medium|           |    6.46|    6.87|
-| 3 |medium| br        |    6.02|    6.69|
-| 3 |medium| gzip      |    5.94|    6.96|
-| 3 |medium| zstd      |    5.60|    6.75|
-| 3 |large |           |   12.94|   13.49|
-| 3 |large | br        |   12.49|   13.43|
-| 3 |large | gzip      |   13.61|   14.85|
-| 3 |large | zstd      |   11.88|   12.80|
-| 3 |huge  |           |   90.88|   85.63|
-| 3 |huge  | br        |   96.64|   19.27|
-| 3 |huge  | gzip      |  112.36|   88.48|
-| 3 |huge  | zstd      |   88.76|   71.26|
-| 4 |full  |           |    2.53|   10.80|
-| 4 |full  | br        |    2.44|   10.31|
-| 4 |full  | gzip      |    2.44|   11.62|
-| 4 |full  | zstd      |    3.10|   12.92|
-| 4 |small |           |    3.27|   11.88|
-| 4 |small | br        |    3.12|   11.67|
-| 4 |small | gzip      |    2.96|   11.49|
-| 4 |small | zstd      |    3.51|   13.02|
-| 4 |medium|           |    5.77|   15.90|
-| 4 |medium| br        |    6.17|   15.07|
-| 4 |medium| gzip      |    6.12|   17.33|
-| 4 |medium| zstd      |    4.75|   15.45|
-| 4 |large |           |    9.20|   28.95|
-| 4 |large | br        |    9.24|   28.84|
-| 4 |large | gzip      |   10.18|   31.24|
-| 4 |large | zstd      |   12.37|   18.11|
-| 4 |huge  |           |   66.58|   87.03|
-| 4 |huge  | br        |   64.69|   79.95|
-| 4 |huge  | gzip      |   81.88|   83.68|
-| 4 |huge  | zstd      |   70.48|   67.81|
-| 5 |full  |           |    3.07|    4.29|
-| 5 |full  | br        |    3.51|        |
-| 5 |full  | gzip      |    2.62|        |
-| 5 |full  | zstd      |    4.66|        |
-| 5 |small |           |    3.80|        |
-| 5 |small | br        |    4.71|        |
-| 5 |small | gzip      |    3.11|        |
-| 5 |small | zstd      |    4.79|        |
-| 5 |medium|           |    6.95|        |
-| 5 |medium| br        |    5.31|        |
-| 5 |medium| gzip      |    5.61|        |
-| 5 |medium| zstd      |    5.28|        |
-| 5 |large |           |   14.02|        |
-| 5 |large | br        |   12.21|        |
-| 5 |large | gzip      |   12.82|        |
-| 5 |large | zstd      |   11.31|        |
-| 5 |huge  |           |   96.00|        |
-| 5 |huge  | br        |   83.86|        |
-| 5 |huge  | gzip      |   75.55|        |
-| 5 |huge  | zstd      |   69.01|        |
-| 9 |full  |           |    2.47|        |
-| 9 |full  | br        |    2.37|        |
-| 9 |full  | gzip      |    3.46|        |
-| 9 |full  | zstd      |    4.11|        |
-| 9 |small |           |    4.06|        |
-| 9 |small | br        |    3.98|        |
-| 9 |small | gzip      |    4.13|        |
-| 9 |small | zstd      |    4.58|        |
-| 9 |medium|           |    5.87|        |
-| 9 |medium| br        |    5.85|        |
-| 9 |medium| gzip      |    6.11|        |
-| 9 |medium| zstd      |    6.05|        |
-| 9 |large |           |   12.62|        |
-| 9 |large | br        |    8.89|        |
-| 9 |large | gzip      |   14.16|        |
-| 9 |large | zstd      |   12.64|        |
-| 9 |huge  |           |   89.55|        |
-| 9 |huge  | br        |   90.85|        |
-| 9 |huge  | gzip      |  103.96|        |
-| 9 |huge  | zstd      |   81.03|        |
+|Lvl|Size  |Compression|Msg Size|Tfr Size|Ratio|  Win H1|  Win H2|  Win H3|
+|:-:|:-----|:----------|-------:|-------:|----:|-------:|-------:|-------:|
+|   |full  |           |     972|     972|    0|    8.36|    8.37|
+| 3 |full  | br        |     972|     505| 1.92|    2.79|    2.96|
+| 3 |full  | gzip      |     972|     527| 1.84|    2.86|    3.21|
+| 3 |full  | zstd      |     972|     518| 1.88|    3.15|    3.50|
+|   |small |           |    7649|    7649|    0|    8.07|    9.56|
+| 3 |small | br        |    7649|    2322| 3.29|    3.17|    4.91|
+| 3 |small | gzip      |    7649|    2464| 3.10|    3.12|    4.86|
+| 3 |small | zstd      |    7649|    2342| 3.27|    3.39|    5.21|
+|   |medium|           |   33918|   33918|    0|   10.29|   12.30|
+| 3 |medium| br        |   33918|    8583| 3.95|    4.20|    6.76|
+| 3 |medium| gzip      |   33918|    9267| 3.66|    4.53|    6.95|
+| 3 |medium| zstd      |   33918|    8610| 3.94|    4.44|    6.78|
+|   |large |           |  138492|  138492|    0|   19.13|   24.63|
+| 3 |large | br        |  138492|   31791| 4.36|   12.31|   14.90|
+| 3 |large | gzip      |  138492|   34864| 3.97|   15.06|   16.34|
+| 3 |large | zstd      |  138492|   31593| 4.38|   10.92|    8.99|
+|   |huge  |           | 1129275| 1129275|    0|  100.54|  133.13|
+| 3 |huge  | br        | 1129275|  247084| 4.57|   74.59|   56.51|
+| 3 |huge  | gzip      | 1129275|  274970| 4.11|   83.40|   63.99|
+| 3 |huge  | zstd      | 1129275|  238049| 4.74|   67.17|   51.25|
+|   |      |           |        |        |     |        |        |
+|   |full  |           |     972|     972|    0|    8.36|    8.37|
+| 4 |full  | br        |     972|     495| 1.96|    2.72|    3.24|
+| 4 |full  | gzip      |     972|     523| 1.86|    2.90|    3.41|
+| 4 |full  | zstd      |     972|     518| 1.88|    3.32|    5.16|
+|   |small |           |    7649|    7649|    0|    8.07|    9.56|
+| 4 |small | br        |    7649|    2273| 3.37|    3.26|    5.04|
+| 4 |small | gzip      |    7649|    2425| 3.15|    3.30|    4.62|
+| 4 |small | zstd      |    7649|    2339| 3.27|    3.49|    5.60|
+|   |medium|           |   33918|   33918|    0|   10.29|   12.30|
+| 4 |medium| br        |   33918|    8384| 4.05|    4.73|    6.92|
+| 4 |medium| gzip      |   33918|    9070| 3.74|    4.68|    7.08|
+| 4 |medium| zstd      |   33918|    8609| 3.94|    4.75|    7.07|
+|   |large |           |  138492|  138492|    0|   19.13|   24.63|
+| 4 |large | br        |  138492|   30572| 4.53|   13.94|   15.03|
+| 4 |large | gzip      |  138492|   33760| 4.10|   15.70|   16.73|
+| 4 |large | zstd      |  138492|   31559| 4.39|   12.15|   13.95|
+|   |huge  |           | 1129275| 1129275|    0|  100.54|  133.13|
+| 4 |huge  | br        | 1129275|  226082| 4.99|   85.28|   58.76|
+| 4 |huge  | gzip      | 1129275|  266054| 4.24|   88.38|  102.53|
+| 4 |huge  | zstd      | 1129275|  237121| 4.76|   68.80|   67.45|
+|   |      |           |        |        |     |        |        |
+|   |full  |           |     972|     972|    0|    8.36|    8.37|
+| 5 |full  | br        |     972|     471| 2.06|    3.25|    4.11|
+| 5 |full  | gzip      |     972|     516| 1.88|    3.23|    4.65|
+| 5 |full  | zstd      |     972|     515| 1.89|    3.84|    5.58|
+|   |small |           |    7649|    7649|    0|    8.07|    9.56|
+| 5 |small | br        |    7649|    2123| 3.60|    4.15|    5.77|
+| 5 |small | gzip      |    7649|    2318| 3.30|    3.71|    5.01|
+| 5 |small | zstd      |    7649|    2301| 3.32|    4.64|    6.42|
+|   |medium|           |   33918|   33918|    0|   10.29|   12.30|
+| 5 |medium| br        |   33918|    7857| 4.32|    6.54|    8.12|
+| 5 |medium| gzip      |   33918|    8535| 3.97|    5.80|    7.17|
+| 5 |medium| zstd      |   33918|    8455| 4.01|    5.68|    8.00|
+|   |large |           |  138492|  138492|    0|   19.13|   24.63|
+| 5 |large | br        |  138492|   28781| 4.81|   17.21|   18.78|
+| 5 |large | gzip      |  138492|   31680| 4.37|   15.49|   17.38|
+| 5 |large | zstd      |  138492|   30755| 4.50|   15.32|   17.26|
+|   |huge  |           | 1129275| 1129275|    0|  100.54|  133.13|
+| 5 |huge  | br        | 1129275|  210248| 5.37|  113.61|  125.45|
+| 5 |huge  | gzip      | 1129275|  250215| 4.51|  105.42|  102.52|
+| 5 |huge  | zstd      | 1129275|  228880| 4.93|   80.48|   97.53|
+|   |      |           |        |        |     |        |        |
+|   |full  |           |     972|     972|    0|    8.36|    8.37|
+| 7 |full  | br        |     972|     466| 2.09|    3.02|    5.75|
+| 7 |full  | gzip      |     972|     516| 1.88|    3.27|    4.63|
+| 7 |full  | zstd      |     972|     513| 1.89|    5.04|    6.75|
+|   |small |           |    7649|    7649|    0|    8.07|    9.56|
+| 7 |small | br        |    7649|    2109| 3.63|    7.40|    9.79|
+| 7 |small | gzip      |    7649|    2267| 3.37|    3.89|    5.20|
+| 7 |small | zstd      |    7649|    2233| 3.43|    5.48|    7.71|
+|   |medium|           |   33918|   33918|    0|   10.29|   12.30|
+| 7 |medium| br        |   33918|    7740| 4.38|   12.68|   12.13|
+| 7 |medium| gzip      |   33918|    8262| 4.11|    5.96|    8.19|
+| 7 |medium| zstd      |   33918|    8057| 4.21|    7.27|    9.54|
+|   |large |           |  138492|  138492|    0|   19.13|   24.63|
+| 7 |large | br        |  138492|   28317| 4.89|   25.60|   20.82|
+| 7 |large | gzip      |  138492|   30572| 4.53|   19.24|   15.25|
+| 7 |large | zstd      |  138492|   29025| 4.77|   17.67|   14.65|
+|   |huge  |           | 1129275| 1129275|    0|  100.54|  133.13|
+| 7 |huge  | br        | 1129275|  205453| 5.50|  138.31|  145.84|
+| 7 |huge  | gzip      | 1129275|  241460| 4.68|  114.66|  122.18|
+| 7 |huge  | zstd      | 1129275|  215582| 5.24|   87.85|   98.56|
+|   |      |           |        |        |     |        |        |
+|   |full  |           |     972|     972|    0|    8.36|    8.37|
+| 9 |full  | br        |     972|     467| 2.08|    4.00|    4.36|
+| 9 |full  | gzip      |     972|     516| 1.88|    2.84|    3.45|
+| 9 |full  | zstd      |     972|     513| 1.89|    5.77|    5.69|
+|   |small |           |    7649|    7649|    0|    8.07|    9.56|
+| 9 |small | br        |    7649|    2109| 3.63|    9.45|    7.01|
+| 9 |small | gzip      |    7649|    2257| 3.39|    3.33|    3.84|
+| 9 |small | zstd      |    7649|    2194| 3.49|    6.21|    6.07|
+|   |medium|           |   33918|   33918|    0|   10.29|   12.30|
+| 9 |medium| br        |   33918|    7707| 4.40|   20.73|   13.36|
+| 9 |medium| gzip      |   33918|    8162| 4.16|    6.59|    6.26|
+| 9 |medium| zstd      |   33918|    7913| 4.29|    8.66|    7.23|
+|   |large |           |  138492|  138492|    0|   19.13|   24.63|
+| 9 |large | br        |  138492|   28122| 4.92|   39.56|   24.68|
+| 9 |large | gzip      |  138492|   30115| 4.60|   25.93|   16.55|
+| 9 |large | zstd      |  138492|   28366| 4.88|   17.94|   11.91|
+|   |huge  |           | 1129275| 1129275|    0|  100.54|  133.13|
+| 9 |huge  | br        | 1129275|  202881| 5.57|  186.05|  205.22|
+| 9 |huge  | gzip      | 1129275|  237292| 4.76|  187.45|  156.16|
+| 9 |huge  | zstd      | 1129275|  211132| 5.35|   99.78|   65.14|
 
 * We notice a marginal improvement but **not** significant improvement running `zstd` using 2 threads.  We suspect that it is due to the GIL and will not provide significant improvement until free threaded Python is released in later versions, for this test is CPU bound rather than I/O bound.
 
-
+## References:
+* [Enhancing FastAPI performance with HTTP and QUIC(HTTP3)](https://medium.com/@vamsikrishnabhuvanam/enhancing-fastapi-performance-with-http-2-and-quic-http-3-for-efficient-machine-learning-189cd054846e)
