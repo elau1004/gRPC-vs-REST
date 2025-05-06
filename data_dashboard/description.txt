@@ -1,0 +1,4 @@
+Calculation info.
+Best Reduced Compress = Max(Avg(Msg Size - TfrSize))
+Best Latency Compress on OS = MIN(Avg(latency os))
+Best Latency Compress on Cloud = MIN(Avg(latency os))
